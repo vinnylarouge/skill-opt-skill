@@ -20,6 +20,8 @@ def _norm(v):
             return date(y, mo, d).isoformat()
         except ValueError:
             pass
+    # Strip thousands separators and currency symbols so "$1,299.00" == 1299.0
+    # (commas are assumed to be thousands separators, valid for monetary amounts).
     num = re.sub(r"[,$£€\s]", "", s)
     if re.match(r"^-?\d+(\.\d+)?$", num):
         return float(num)

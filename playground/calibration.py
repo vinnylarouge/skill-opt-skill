@@ -28,4 +28,8 @@ def _pearson(a, b):
 
 
 def spearman(a, b):
+    if len(a) != len(b):
+        raise ValueError(f"spearman requires equal-length sequences, got {len(a)} and {len(b)}")
+    if len(a) == 0:
+        raise ValueError("spearman requires non-empty sequences")
     return _pearson(_ranks(a), _ranks(b))

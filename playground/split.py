@@ -18,4 +18,6 @@ def train_holdout(path, holdout_fraction=0.3, seed=0):
     n_hold = max(1, round(len(order) * holdout_fraction))
     holdout = sorted(order[:n_hold], key=lambda t: t["id"])
     train = sorted(order[n_hold:], key=lambda t: t["id"])
+    if not train:
+        raise ValueError(f"holdout_fraction={holdout_fraction} leaves no training tasks")
     return train, holdout

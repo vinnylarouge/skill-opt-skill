@@ -1,3 +1,4 @@
+import pytest
 import calibration
 
 def test_perfect_monotonic_is_one():
@@ -8,3 +9,11 @@ def test_reversed_is_minus_one():
 
 def test_handles_ties():
     assert calibration.spearman([1, 2, 3], [5, 5, 5]) == 0.0
+
+def test_length_mismatch_raises():
+    with pytest.raises(ValueError):
+        calibration.spearman([1, 2, 3], [1, 2])
+
+def test_empty_raises():
+    with pytest.raises(ValueError):
+        calibration.spearman([], [])

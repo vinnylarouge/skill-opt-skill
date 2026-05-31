@@ -7,11 +7,12 @@ def test_split_is_deterministic():
     assert [t["id"] for t in a[1]] == [t["id"] for t in b[1]]
 
 def test_split_partitions_without_overlap():
+    fields, tasks = split.load("playground/data/tasks.json")
     train, holdout = split.train_holdout("playground/data/tasks.json", 0.3, seed=0)
     ids_train = {t["id"] for t in train}
     ids_hold = {t["id"] for t in holdout}
     assert ids_train.isdisjoint(ids_hold)
-    assert len(ids_train) + len(ids_hold) >= 18
+    assert len(ids_train) + len(ids_hold) == len(tasks)
     assert len(ids_hold) >= 1
 
 def test_gold_scores_perfectly_against_itself():
