@@ -12,4 +12,5 @@ holdout_fraction: 0.3
 checkpoint_every: 1
 parallelism: serial      # serial | <int fan-out width>
 edit_panel: 1            # candidates per round (keep best on holdout)
+gate_margin: 0.0         # held-out improvement margin required to accept (passed to ledger.py gate --margin)
 validation_depth: self-contained   # map-only | self-contained | verifiers-env | full-ablation

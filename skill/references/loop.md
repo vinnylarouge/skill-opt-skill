@@ -18,7 +18,7 @@ edit-budget enforcement, gate margin, memory/slow-update policy, parallelism, an
 | `checkpoint_every` | 1 | Every iteration is checkpointed; this controls accepted-log summary writes |
 | `parallelism` | `serial` | `serial` = one-man-play; integer N = up to N concurrent subagents |
 | `edit_panel` | 1 | Candidates proposed per round; gate all, keep best on holdout |
-| `gate_margin` | 0.0 | Candidate must beat best_so_far by at least this margin to be accepted |
+| `gate_margin` | 0.0 | Config key: the agent passes its value to `ledger.py gate --margin` (NOT auto-read by the script); candidate must beat best_so_far by strictly more than this margin |
 | `validation_depth` | `self-contained` | `map-only` \| `self-contained` \| `verifiers-env` \| `full-ablation` |
 
 ---
@@ -52,20 +52,24 @@ The edit budget is the **textual learning rate** — it prevents catastrophic ov
 
 ```
 candidate_mean = mean(holdout scores for current iter)
-best_so_far    = max(best_so_far column in ledger.csv)
-accept         = candidate_mean >= best_so_far + gate_margin
+best_so_far    = max held-out mean across all accepted versions (computed by ledger.py best(), NOT a stored column)
+accept         = candidate_mean > best_so_far + gate_margin   # strict; a tie is rejected
 ```
 
 Output: `accept` or `reject`. This is deterministic — no LLM involved in the decision.
 
+> Invariant: the v0 baseline holdout eval MUST be recorded during SETUP (`ledger.py record --version v0 --split holdout`) before the first `gate` call. Otherwise best() returns None and the first candidate is accepted unconditionally (fail-open).
+
+> Version-label convention (load-bearing): the baseline ledger label is `v0`; the candidate at iteration N is labelled `cN` (c1, c2, ...). Pass the SAME label to `ledger.py record --version cN --split holdout` and `ledger.py gate --candidate cN` — `holdout_mean()` looks up rows by exact version string, so a mismatch makes the gate find no scores. On-disk skill files (skill/v0.md, skill/v1.md, ...) are named independently of these ledger labels.
+
+On accept/reject: `ledger.py gate` has ALREADY written the kind=gate decision row. Do not call `record` for the decision — `record` only writes kind=eval rows and cannot set the decision field. On accept, also save the candidate to skill/v(K+1).md and update current.md; on reject, append the reason to memory/rejected-edits.md.
+
 On `accept`:
 - Copy `candidates/iter-NN/candidate.md` → `skill/v(K+1).md` and `skill/current.md`.
 - Append to `memory/accepted-log.md` with held-out delta.
-- `ledger.py record` updates `ledger.csv` with decision=`accept`.
 
 On `reject`:
 - Append to `memory/rejected-edits.md`: the edit.json, failure reason (score delta), and iteration.
-- `ledger.py record` updates `ledger.csv` with decision=`reject`.
 - Increment no-improvement counter; check against `early_stop_patience`.
 
 ---

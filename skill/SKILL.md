@@ -31,6 +31,7 @@ Ask the user these questions, then write `config.yml` from `templates/config.yml
 | `checkpoint_every` | `1` | iterations between checkpoint summaries |
 | `parallelism` | `serial` | `serial` \| integer fan-out width |
 | `edit_panel` | `1` | candidates per round; gate all, keep best |
+| `gate_margin` | `0.0` | held-out margin to accept; passed to `ledger.py gate --margin` |
 | `validation_depth` | `self-contained` | `map-only` \| `self-contained` \| `verifiers-env` \| `full-ablation` |
 
 See `references/feedback-sources.md` for how each `feedback_source` builds the task suite.
@@ -75,7 +76,7 @@ FINALIZE : emit per output_mode (overwrite w/ v0 backup, or save-as-new <skill>-
   rollouts/       iter-NN/task-MM/  trajectory.md  score.json
   candidates/     iter-NN/          candidate.md   edit.json
   memory/         rejected-edits.md  accepted-log.md
-  ledger.csv      (source of truth: iter, split, mean_score, decision, best_so_far)
+  ledger.csv      (source of truth; columns: iter, kind, version, split, mean_score, n, decision)
   report.md
 ```
 

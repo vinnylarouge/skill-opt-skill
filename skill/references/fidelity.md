@@ -15,7 +15,7 @@ is mapped to the file or step that implements it here. Deviations are explicitly
 
 All five mechanisms are present: rollout, reflect, edit budget, held-out gate, memory.
 
-The `scripts/ledger.py decide` command implements the gate decision deterministically.
+The `scripts/ledger.py gate` subcommand implements the gate decision deterministically (via the internal `decide()` function).
 The frozen target is implemented via the fresh-subagent discipline described in SKILL.md.
 
 ## References
