@@ -58,3 +58,16 @@ def best(run_dir):
     if not scored:
         return (None, None)
     return max(scored, key=lambda t: t[1])
+
+
+def decide(run_dir, iter, candidate_version, margin=0.0):
+    cand = holdout_mean(run_dir, candidate_version)
+    best_version, best_score = best(run_dir)
+    accept = cand is not None and (best_score is None or cand > best_score + margin)
+    shown = cand if cand is not None else 0.0
+    _append(run_dir, {"iter": iter, "kind": "gate", "version": candidate_version,
+                      "split": "holdout", "mean_score": f"{shown:.6f}", "n": "",
+                      "decision": "accept" if accept else "reject"})
+    if accept:
+        return ("accept", candidate_version, cand)
+    return ("reject", best_version, best_score)
