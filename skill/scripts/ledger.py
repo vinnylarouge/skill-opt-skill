@@ -42,3 +42,19 @@ def holdout_mean(run_dir, version):
     if not rows:
         return None
     return float(rows[-1]["mean_score"])
+
+
+def accepted_versions(run_dir):
+    accepted = ["v0"]
+    for r in _read(run_dir):
+        if r["kind"] == "gate" and r["decision"] == "accept":
+            accepted.append(r["version"])
+    return accepted
+
+
+def best(run_dir):
+    scored = [(v, holdout_mean(run_dir, v)) for v in accepted_versions(run_dir)]
+    scored = [(v, s) for v, s in scored if s is not None]
+    if not scored:
+        return (None, None)
+    return max(scored, key=lambda t: t[1])

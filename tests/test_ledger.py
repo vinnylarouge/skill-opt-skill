@@ -13,3 +13,10 @@ def test_latest_eval_wins(tmp_path):
     ledger.append_eval(run, 0, "v0", "holdout", [0.2])
     ledger.append_eval(run, 5, "v0", "holdout", [0.9])
     assert abs(ledger.holdout_mean(run, "v0") - 0.9) < 1e-9
+
+def test_best_with_only_baseline(tmp_path):
+    ledger.append_eval(tmp_path, 0, "v0", "holdout", [0.5])
+    assert ledger.best(tmp_path) == ("v0", 0.5)
+
+def test_accepted_versions_starts_with_v0(tmp_path):
+    assert ledger.accepted_versions(tmp_path) == ["v0"]
