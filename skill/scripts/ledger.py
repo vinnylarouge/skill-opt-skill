@@ -71,3 +71,38 @@ def decide(run_dir, iter, candidate_version, margin=0.0):
     if accept:
         return ("accept", candidate_version, cand)
     return ("reject", best_version, best_score)
+
+
+def main():
+    import argparse
+    ap = argparse.ArgumentParser(description="skill-opt deterministic ledger")
+    sub = ap.add_subparsers(dest="cmd", required=True)
+
+    r = sub.add_parser("record")
+    for a in ("--run", "--version", "--split", "--scores"):
+        r.add_argument(a, required=True)
+    r.add_argument("--iter", type=int, required=True)
+
+    g = sub.add_parser("gate")
+    g.add_argument("--run", required=True)
+    g.add_argument("--iter", type=int, required=True)
+    g.add_argument("--candidate", required=True)
+    g.add_argument("--margin", type=float, default=0.0)
+
+    b = sub.add_parser("best")
+    b.add_argument("--run", required=True)
+
+    args = ap.parse_args()
+    if args.cmd == "record":
+        scores = [float(x) for x in args.scores.split(",") if x != ""]
+        print(f"{append_eval(args.run, args.iter, args.version, args.split, scores):.6f}")
+    elif args.cmd == "gate":
+        outcome, version, score = decide(args.run, args.iter, args.candidate, args.margin)
+        print(f"{outcome} {version} {score}")
+    elif args.cmd == "best":
+        v, s = best(args.run)
+        print(f"{v} {s}")
+
+
+if __name__ == "__main__":
+    main()
