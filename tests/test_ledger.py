@@ -1,3 +1,4 @@
+import pytest
 import ledger
 
 def test_append_eval_then_holdout_mean(tmp_path):
@@ -47,3 +48,7 @@ def test_accepted_candidate_becomes_eligible_best(tmp_path):
     ledger.append_eval(tmp_path, 1, "c1", "holdout", [0.7])
     ledger.decide(tmp_path, 1, "c1", margin=0.0)
     assert ledger.best(tmp_path) == ("c1", 0.7)
+
+def test_append_eval_empty_scores_raises(tmp_path):
+    with pytest.raises(ValueError):
+        ledger.append_eval(tmp_path, 0, "v0", "holdout", [])

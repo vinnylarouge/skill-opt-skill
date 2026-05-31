@@ -29,7 +29,9 @@ def _append(run_dir, row):
 
 def append_eval(run_dir, iter, version, split, scores):
     scores = list(scores)
-    mean = sum(scores) / len(scores) if scores else 0.0
+    if not scores:
+        raise ValueError("append_eval: scores must be non-empty")
+    mean = sum(scores) / len(scores)
     _append(run_dir, {"iter": iter, "kind": "eval", "version": version,
                       "split": split, "mean_score": f"{mean:.6f}",
                       "n": len(scores), "decision": ""})
@@ -45,6 +47,13 @@ def holdout_mean(run_dir, version):
 
 
 def accepted_versions(run_dir):
+    """Accepted skill versions, baseline-first. Always includes "v0".
+
+    Invariant (enforced by the optimization loop's SETUP phase): a holdout eval
+    for "v0" MUST be recorded via append_eval before the first decide() call.
+    Otherwise best() has no baseline score and the gate accepts the first
+    candidate unconditionally (fail-open).
+    """
     accepted = ["v0"]
     for r in _read(run_dir):
         if r["kind"] == "gate" and r["decision"] == "accept":
@@ -64,9 +73,9 @@ def decide(run_dir, iter, candidate_version, margin=0.0):
     cand = holdout_mean(run_dir, candidate_version)
     best_version, best_score = best(run_dir)
     accept = cand is not None and (best_score is None or cand > best_score + margin)
-    shown = cand if cand is not None else 0.0
+    shown = f"{cand:.6f}" if cand is not None else ""
     _append(run_dir, {"iter": iter, "kind": "gate", "version": candidate_version,
-                      "split": "holdout", "mean_score": f"{shown:.6f}", "n": "",
+                      "split": "holdout", "mean_score": shown, "n": "",
                       "decision": "accept" if accept else "reject"})
     if accept:
         return ("accept", candidate_version, cand)
@@ -98,10 +107,12 @@ def main():
         print(f"{append_eval(args.run, args.iter, args.version, args.split, scores):.6f}")
     elif args.cmd == "gate":
         outcome, version, score = decide(args.run, args.iter, args.candidate, args.margin)
-        print(f"{outcome} {version} {score}")
+        score_str = f"{score:.6f}" if score is not None else "None"
+        print(f"{outcome} {version} {score_str}")
     elif args.cmd == "best":
         v, s = best(args.run)
-        print(f"{v} {s}")
+        s_str = f"{s:.6f}" if s is not None else "None"
+        print(f"{v} {s_str}")
 
 
 if __name__ == "__main__":
