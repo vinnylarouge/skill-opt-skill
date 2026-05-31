@@ -1,0 +1,1 @@
+{"iter":1,"ops":[{"op":"add","target":"## Normalization / Date","rationale":"train failures t000/t002/t003 show non-ISO dates; add ISO-8601 date rule (1 op, ~40 words)"}],"edit_budget":{"max_ops":3,"max_words":80}}

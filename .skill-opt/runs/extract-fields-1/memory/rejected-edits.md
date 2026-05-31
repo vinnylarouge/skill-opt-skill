@@ -1,0 +1,1 @@
+iter3: REJECT c3 (holdout 1.00, ties best c2 1.00; strict gate). note-null rule helps TRAIN but holdout has no absent-note tasks to validate it -> not accepted. Signal: enlarge holdout to capture note-null cases. patience=1.

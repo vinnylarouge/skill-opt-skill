@@ -1,0 +1,178 @@
+[
+  {
+    "id": "t000",
+    "text": "Invoice from Acme Corp dated 3/1/2026 for $1,299.00. No memo.",
+    "gold": {
+      "vendor": "acme corp",
+      "date": "2026-03-01",
+      "amount": 1299.0,
+      "currency": "usd",
+      "note": null
+    }
+  },
+  {
+    "id": "t001",
+    "text": "Globex billed \u20ac450 on 2026-1-3 (ref: Q1 retainer).",
+    "gold": {
+      "vendor": "globex",
+      "date": "2026-01-03",
+      "amount": 450.0,
+      "currency": "eur",
+      "note": "q1 retainer"
+    }
+  },
+  {
+    "id": "t002",
+    "text": "Receipt: Initech, 12 Feb 2026, GBP 78.5.",
+    "gold": {
+      "vendor": "initech",
+      "date": "2026-02-12",
+      "amount": 78.5,
+      "currency": "gbp",
+      "note": null
+    }
+  },
+  {
+    "id": "t003",
+    "text": "Umbrella Ltd charged \u00a32,500.00 on Apr 05, 2026. Memo: annual licence.",
+    "gold": {
+      "vendor": "umbrella ltd",
+      "date": "2026-04-05",
+      "amount": 2500.0,
+      "currency": "gbp",
+      "note": "annual licence"
+    }
+  },
+  {
+    "id": "t004",
+    "text": "Stark Industries invoice 5/20/2026 USD 8,450.75 \u2014 project phoenix.",
+    "gold": {
+      "vendor": "stark industries",
+      "date": "2026-05-20",
+      "amount": 8450.75,
+      "currency": "usd",
+      "note": "project phoenix"
+    }
+  },
+  {
+    "id": "t005",
+    "text": "Bill from Nakatomi Corp, 2026-7-9, EUR 199.",
+    "gold": {
+      "vendor": "nakatomi corp",
+      "date": "2026-07-09",
+      "amount": 199.0,
+      "currency": "eur",
+      "note": null
+    }
+  },
+  {
+    "id": "t006",
+    "text": "Weyland-Yutani: 15 Mar 2026, $320.00, ref consulting hours.",
+    "gold": {
+      "vendor": "weyland-yutani",
+      "date": "2026-03-15",
+      "amount": 320.0,
+      "currency": "usd",
+      "note": "consulting hours"
+    }
+  },
+  {
+    "id": "t007",
+    "text": "Cyberdyne Systems receipt for GBP 55 dated Jun 30, 2026.",
+    "gold": {
+      "vendor": "cyberdyne systems",
+      "date": "2026-06-30",
+      "amount": 55.0,
+      "currency": "gbp",
+      "note": null
+    }
+  },
+  {
+    "id": "t008",
+    "text": "Purchase order: Oscorp, 8/14/2026, \u20ac3,750.00, note: hardware refresh.",
+    "gold": {
+      "vendor": "oscorp",
+      "date": "2026-08-14",
+      "amount": 3750.0,
+      "currency": "eur",
+      "note": "hardware refresh"
+    }
+  },
+  {
+    "id": "t009",
+    "text": "Wayne Enterprises billed $10,000 on 01 Jan 2026.",
+    "gold": {
+      "vendor": "wayne enterprises",
+      "date": "2026-01-01",
+      "amount": 10000.0,
+      "currency": "usd",
+      "note": null
+    }
+  },
+  {
+    "id": "t011",
+    "text": "Tyrell Corp invoice dated Nov 11, 2026 for USD 6,200. No reference.",
+    "gold": {
+      "vendor": "tyrell corp",
+      "date": "2026-11-11",
+      "amount": 6200.0,
+      "currency": "usd",
+      "note": null
+    }
+  },
+  {
+    "id": "t012",
+    "text": "Soylent Corp \u20ac88 charged 2026-3-30. Purpose: office supplies.",
+    "gold": {
+      "vendor": "soylent corp",
+      "date": "2026-03-30",
+      "amount": 88.0,
+      "currency": "eur",
+      "note": "office supplies"
+    }
+  },
+  {
+    "id": "t013",
+    "text": "Invoice: Rekall Inc, 7/4/2026, $12.50.",
+    "gold": {
+      "vendor": "rekall inc",
+      "date": "2026-07-04",
+      "amount": 12.5,
+      "currency": "usd",
+      "note": null
+    }
+  },
+  {
+    "id": "t015",
+    "text": "Dunder Mifflin receipt: 2026-12-1, EUR 250.00.",
+    "gold": {
+      "vendor": "dunder mifflin",
+      "date": "2026-12-01",
+      "amount": 250.0,
+      "currency": "eur",
+      "note": null
+    }
+  },
+  {
+    "id": "t017",
+    "text": "Prestige Worldwide: 22 Sep 2026, GBP 1,375. No memo.",
+    "gold": {
+      "vendor": "prestige worldwide",
+      "date": "2026-09-22",
+      "amount": 1375.0,
+      "currency": "gbp",
+      "note": null
+    }
+  },
+  {
+    "id": "t019",
+    "text": "Monsters Inc billed $7,654.32 on Dec 31, 2026. Memo: annual retainer.",
+    "gold": {
+      "vendor": "monsters inc",
+      "date": "2026-12-31",
+      "amount": 7654.32,
+      "currency": "usd",
+      "note": "annual retainer"
+    }
+  }
+]
