@@ -1,0 +1,13 @@
+[
+  {
+    "op": "replace",
+    "location": "SKILL.md > The Loop > GATE line",
+    "rationale": "h001 failure: model described multi-candidate gating but didn't use 'both candidates' phrasing. Adding to Loop section makes it salient."
+  },
+  {
+    "op": "add",
+    "location": "SKILL.md > Resume > after first paragraph",
+    "content": "Accepted versions are never lost \u2014 skill files are preserved on disk even if a crash interrupts the memory update; resume detects and completes the interrupted write.",
+    "rationale": "h035 failure: model explained crash safety correctly but didn't use 'not lost'/'preserved'. Explicit guarantee makes natural phrasing available."
+  }
+]

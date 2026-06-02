@@ -1,0 +1,16 @@
+# skill-opt run configuration (filled from the up-front questionnaire)
+target_skill:            # REQUIRED: path to the SKILL.md (or skill dir) to optimize
+edit_references: false   # also edit the target skill's references/?
+feedback_source: proposed-ratified   # proposed-ratified | autonomous | user-suite | live
+feedback_timing: autonomous          # autonomous | interactive (pause at each gate)
+output_mode: save-as-new             # save-as-new | overwrite (keeps v0 backup)
+max_iterations: 12
+early_stop_patience: 3
+edit_budget: {max_ops: 3, max_words: 80}   # the "textual learning rate"
+minibatch_size: 6
+holdout_fraction: 0.3
+checkpoint_every: 1
+parallelism: serial      # serial | <int fan-out width>
+edit_panel: 1            # candidates per round (keep best on holdout)
+gate_margin: 0.0         # held-out improvement margin required to accept (passed to ledger.py gate --margin)
+validation_depth: self-contained   # map-only | self-contained | verifiers-env | full-ablation

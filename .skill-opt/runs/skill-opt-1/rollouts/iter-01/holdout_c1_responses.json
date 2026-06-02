@@ -1,0 +1,12 @@
+{
+  "t000": "autonomous",
+  "t005": "3",
+  "t007": "`candidates/iter-03/candidate.md`",
+  "t010": "`skill/v0.md`",
+  "t016": "SUCCESS and FAILURE.",
+  "t018": "N",
+  "t021": "N",
+  "t023": "Reject",
+  "t024": "Accept",
+  "t029": "It scores that leaf: since `trajectory.md` exists but `score.json` is absent, Resume treats that rollout as incomplete and runs the scoring step to produce `score.json` for `rollouts/iter-02/task-04/`."
+}

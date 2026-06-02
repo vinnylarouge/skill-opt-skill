@@ -97,7 +97,7 @@ In all modes a **held-out split** is carved for gating (for mode 4, a rolling he
   memory/
     rejected-edits.md         # each rejected edit + why it failed the gate (slow-update memory)
     accepted-log.md           # chronicle of accepted edits + held-out deltas
-  ledger.csv                  # SOURCE OF TRUTH: iter, split, mean_score, n, decision, best_so_far
+  ledger.csv                  # SOURCE OF TRUTH; columns: iter, kind, version, split, mean_score, n, decision (best_so_far is derived)
   report.md                   # final: baseline→best diff, per-task gains, judge-calibration summary
 ```
 

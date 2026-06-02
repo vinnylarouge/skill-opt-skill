@@ -1,0 +1,20 @@
+[
+  {
+    "op": "add",
+    "location": "After frontmatter, before '# skill-opt' heading",
+    "content": "<!-- Key definitions (canonical phrasing):\n  gate_margin: candidate must beat the best by at least this margin\n  frozen target: each rollout subagent receives only skill text and task\n  edit budget: textual learning rate preventing catastrophic overwrites\n  early_stop_patience: stop after K consecutive non-improving gates\n-->",
+    "rationale": "Two iterations proved that placing terminology in tables/sections/quick-references doesn't anchor subagent word choice. HTML comments at the document top are read by the model but feel like 'source of truth' definitions. Using exact phrasing 'beat the best' as a canonical definition may finally anchor these terms."
+  },
+  {
+    "op": "add",
+    "location": "After 'Run Directory Layout' section, before 'Resume'",
+    "content": "## ledger.py CLI Reference\n\n```\nledger.py record --run <path> --iter <N> --version <label> --split train|holdout --scores <comma-separated-floats>\nledger.py gate   --run <path> --iter <N> --candidate <cN> --margin <float>\nledger.py best   --run <path>\n```\n\n`--scores` takes comma-separated floats, e.g. `--scores \"0.8,1.0,0.6\"`.",
+    "rationale": "Proven useful for exec_ledger train tasks across iterations."
+  },
+  {
+    "op": "add",
+    "location": "Minibatch Sampling section, after last bullet",
+    "content": "Epoch count after K iterations = K×M/T (float division; partial epochs count).",
+    "rationale": "Proven useful for epoch calculation tasks."
+  }
+]

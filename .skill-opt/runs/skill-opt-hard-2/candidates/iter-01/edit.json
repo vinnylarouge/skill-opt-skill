@@ -1,0 +1,20 @@
+[
+  {
+    "op": "add",
+    "location": "After 'Run Directory Layout' section, before 'Resume'",
+    "content": "## ledger.py CLI Reference\n\n```\nledger.py record --run <path> --iter <N> --version <label> --split train|holdout --scores <comma-separated-floats>\nledger.py gate   --run <path> --iter <N> --candidate <cN> --margin <float>\nledger.py best   --run <path>\n```\n\n`--scores` takes comma-separated floats, e.g. `--scores \"0.8,1.0,0.6\"`.",
+    "rationale": "Subagents guess --run-dir and space-separated scores because exact CLI arg names/formats are not shown. Caused 0.0 on exec_ledger tasks."
+  },
+  {
+    "op": "add",
+    "location": "Minibatch Sampling section, after last bullet",
+    "content": "Epoch count after K iterations = K*M/T (float division; partial epochs count).",
+    "rationale": "Subagent used integer division for epoch count (3 vs expected 3.33). Skill text doesn't clarify epoch count is continuous."
+  },
+  {
+    "op": "replace",
+    "location": "Defaults Table, gate_margin description",
+    "content": "candidate must beat the best score so far by strictly more than this margin to be accepted",
+    "rationale": "Token-limit tasks check for exact terms 'beat' and 'best'. Current phrasing doesn't surface these prominently enough (scored 0.33)."
+  }
+]

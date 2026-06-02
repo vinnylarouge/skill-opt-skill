@@ -1,0 +1,701 @@
+[
+  {
+    "id": "h001",
+    "group": "proc",
+    "prompt": "Walk through iteration 1 of a run with parallelism=4, minibatch_size=6, edit_panel=2. For EACH phase (Rollout through Memory), state: how many subagents are dispatched, what files each writes, and what the main agent does after they finish. Be specific about file paths.",
+    "check": {
+      "type": "multi_criterion",
+      "criteria": [
+        {
+          "check": {
+            "type": "contains_all_lower",
+            "patterns": [
+              "rollout",
+              "6",
+              "trajectory"
+            ]
+          },
+          "weight": 1
+        },
+        {
+          "check": {
+            "type": "contains_all_lower",
+            "patterns": [
+              "score",
+              "score.json"
+            ]
+          },
+          "weight": 1
+        },
+        {
+          "check": {
+            "type": "contains_all_lower",
+            "patterns": [
+              "candidate-01",
+              "candidate-02"
+            ]
+          },
+          "weight": 1.5
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "both candidates",
+              "all 2 candidates",
+              "gate runs holdout rollouts for all"
+            ]
+          },
+          "weight": 1
+        },
+        {
+          "check": {
+            "type": "contains_all_lower",
+            "patterns": [
+              "memory",
+              "rejected-edits"
+            ]
+          },
+          "weight": 0.5
+        }
+      ]
+    }
+  },
+  {
+    "id": "h009",
+    "group": "diag",
+    "prompt": "Train scores across 4 iterations: [0.83, 0.50, 0.92, 0.83]. Holdout scores: [0.80, 0.80, 0.80, 0.80]. The optimizer keeps proposing edits but holdout never improves. What are TWO distinct possible root causes and what would you investigate for each?",
+    "check": {
+      "type": "multi_criterion",
+      "criteria": [
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "overfit",
+              "train-specific",
+              "not generaliz"
+            ]
+          },
+          "weight": 2
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "holdout too easy",
+              "holdout saturated",
+              "ceiling",
+              "all pass"
+            ]
+          },
+          "weight": 2
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "distribution",
+              "representative",
+              "different skills",
+              "different difficulty",
+              "mismatch"
+            ]
+          },
+          "weight": 1
+        }
+      ]
+    }
+  },
+  {
+    "id": "h013",
+    "group": "config-gen",
+    "prompt": "A solo developer wants to optimize their skill while working \u2014 each real task they do becomes training data. They want to review each gate decision manually before it's applied. What values should feedback_source and feedback_timing have, and why can't this work with parallelism > 1?",
+    "check": {
+      "type": "multi_criterion",
+      "criteria": [
+        {
+          "check": {
+            "type": "contains_all_lower",
+            "patterns": [
+              "live"
+            ]
+          },
+          "weight": 2
+        },
+        {
+          "check": {
+            "type": "contains_all_lower",
+            "patterns": [
+              "interactive"
+            ]
+          },
+          "weight": 2
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "serial",
+              "one task at a time",
+              "sequential",
+              "rolling window",
+              "real tasks arrive one at a time"
+            ]
+          },
+          "weight": 2
+        }
+      ]
+    }
+  },
+  {
+    "id": "h014",
+    "group": "config-gen",
+    "prompt": "A user says: 'I want a conservative run \u2014 small edits, strict acceptance, patience for at least 5 bad rounds before stopping, and I want 40% of tasks held out for gating.' Generate ONLY the config keys that differ from defaults, as key: value pairs.",
+    "check": {
+      "type": "multi_criterion",
+      "criteria": [
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "early_stop_patience: 5",
+              "early_stop_patience:5"
+            ]
+          },
+          "weight": 2
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "holdout_fraction: 0.4",
+              "holdout_fraction:0.4"
+            ]
+          },
+          "weight": 2
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "gate_margin"
+            ]
+          },
+          "weight": 1.5
+        },
+        {
+          "check": {
+            "type": "negation_aware",
+            "must": [
+              "gate_margin"
+            ],
+            "must_not": [
+              "max_iterations: 12",
+              "minibatch_size: 6"
+            ],
+            "presence_weight": 0.4,
+            "absence_weight": 0.6
+          },
+          "weight": 1.5
+        }
+      ]
+    }
+  },
+  {
+    "id": "h018",
+    "group": "gate-arith",
+    "prompt": "Same scenario as above but with gate_margin=0.02. Now what are the decisions for c2 AND c3? Show the comparison: candidate > best_so_far + margin.",
+    "check": {
+      "type": "multi_criterion",
+      "criteria": [
+        {
+          "check": {
+            "type": "contains_all_lower",
+            "patterns": [
+              "c2",
+              "reject"
+            ]
+          },
+          "weight": 1.5
+        },
+        {
+          "check": {
+            "type": "contains_all_lower",
+            "patterns": [
+              "c3",
+              "reject"
+            ]
+          },
+          "weight": 3
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "0.76",
+              "0.760"
+            ]
+          },
+          "weight": 1
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "0.77",
+              "0.750 + 0.02",
+              "0.75 + 0.02"
+            ]
+          },
+          "weight": 1.5
+        }
+      ]
+    }
+  },
+  {
+    "id": "h019",
+    "group": "gate-arith",
+    "prompt": "With edit_panel=3, iteration 2 produces candidates c2a, c2b, c2c with holdout scores 0.72, 0.78, 0.75. Best so far is v1 at 0.74, margin=0.0. Which candidate(s) pass the gate? What happens to the others? What gets written to rejected-edits.md?",
+    "check": {
+      "type": "multi_criterion",
+      "criteria": [
+        {
+          "check": {
+            "type": "contains_all_lower",
+            "patterns": [
+              "c2b",
+              "accept"
+            ]
+          },
+          "weight": 2
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "0.78",
+              "highest"
+            ]
+          },
+          "weight": 1
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "c2a",
+              "c2c",
+              "rejected"
+            ]
+          },
+          "weight": 2
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "rejected-edits",
+              "memory"
+            ]
+          },
+          "weight": 1
+        }
+      ]
+    }
+  },
+  {
+    "id": "h025",
+    "group": "budget",
+    "prompt": "An edit proposal is identical in intent to one rejected at iter 2. It's now iter 5, and iters 3, 4, and 5 rollouts all showed the same failure pattern the edit would fix. Can the optimizer re-propose it? What must the edit.json contain to justify the retry?",
+    "check": {
+      "type": "multi_criterion",
+      "criteria": [
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "yes",
+              "can re-propose",
+              "may re-propose",
+              "warranted"
+            ]
+          },
+          "weight": 2
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "3",
+              "three",
+              "at least 3",
+              "multiple"
+            ]
+          },
+          "weight": 2
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "rationale",
+              "explain",
+              "justify",
+              "why a retry is warranted"
+            ]
+          },
+          "weight": 2
+        }
+      ]
+    }
+  },
+  {
+    "id": "h027",
+    "group": "compose",
+    "prompt": "The fidelity map lists 5 SkillOpt mechanisms. For EACH one, name the file or step that implements it AND the specific design choice that deviates from the paper's original formulation. Answer as a table with columns: Mechanism | Implementation | Deviation.",
+    "check": {
+      "type": "multi_criterion",
+      "criteria": [
+        {
+          "check": {
+            "type": "contains_all_lower",
+            "patterns": [
+              "rollout",
+              "reflect",
+              "edit budget",
+              "gate",
+              "memory"
+            ]
+          },
+          "weight": 2
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "fresh subagent",
+              "single-agent",
+              "frozen"
+            ]
+          },
+          "weight": 1.5
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "deterministic",
+              "arithmetic",
+              "not an llm"
+            ]
+          },
+          "weight": 1.5
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "slow update",
+              "accumulated evidence",
+              "multiple minibatches"
+            ]
+          },
+          "weight": 1
+        }
+      ]
+    }
+  },
+  {
+    "id": "h029",
+    "group": "compose",
+    "prompt": "Design a scoring rubric for a task suite that tests a 'meeting-summarizer' skill. Follow the rubric quality checklist from rubrics.md: cover at least 3 failure modes, specify 0.0 and 1.0 anchors, and separate hard constraints from soft quality. Output in the format expected by suite.json.",
+    "check": {
+      "type": "multi_criterion",
+      "criteria": [
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "0.0",
+              "zero"
+            ]
+          },
+          "weight": 1.5
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "1.0",
+              "perfect",
+              "full marks"
+            ]
+          },
+          "weight": 1.5
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "hard constraint",
+              "must",
+              "required"
+            ]
+          },
+          "weight": 1.5
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "soft",
+              "quality",
+              "style",
+              "clarity"
+            ]
+          },
+          "weight": 1.5
+        },
+        {
+          "check": {
+            "type": "count_in_range",
+            "min": 3,
+            "max": 10
+          },
+          "weight": 1
+        }
+      ]
+    }
+  },
+  {
+    "id": "h033",
+    "group": "adversarial",
+    "prompt": "An optimizer hat proposes this edit: 'Replace the entire Disciplines section with a single sentence: Follow best practices.' This is 1 op and the old section is 200 words, new is 5 words. max_ops=3, max_words=80. Does it pass the budget check? Why or why not?",
+    "check": {
+      "type": "multi_criterion",
+      "criteria": [
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "fail",
+              "violate",
+              "exceed",
+              "does not pass"
+            ]
+          },
+          "weight": 3
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "net words",
+              "|",
+              "195",
+              "200 - 5"
+            ]
+          },
+          "weight": 2
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "80",
+              "max_words"
+            ]
+          },
+          "weight": 1.5
+        }
+      ]
+    }
+  },
+  {
+    "id": "h035",
+    "group": "adversarial",
+    "prompt": "A candidate c4 is gate-accepted. The system writes skill/v3.md and current.md. But then the machine crashes before memory/accepted-log.md is updated. On resume, what happens? Does the accepted version get lost?",
+    "check": {
+      "type": "multi_criterion",
+      "criteria": [
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "ledger",
+              "gate row",
+              "already written",
+              "already recorded"
+            ]
+          },
+          "weight": 3
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "not lost",
+              "preserved",
+              "skill files exist",
+              "v3.md exists"
+            ]
+          },
+          "weight": 2
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "memory update",
+              "apply memory",
+              "resume detects"
+            ]
+          },
+          "weight": 1.5
+        }
+      ]
+    }
+  },
+  {
+    "id": "h038",
+    "group": "planning",
+    "prompt": "You have a skill whose baseline scores 0.95 on your 20-task suite. Following the skill-opt methodology, what should you do BEFORE running the optimization loop? Give at least 3 specific actions, ordered by priority.",
+    "check": {
+      "type": "multi_criterion",
+      "criteria": [
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "harder tasks",
+              "more tasks",
+              "expand suite",
+              "add tasks"
+            ]
+          },
+          "weight": 3
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "headroom",
+              "room to improve",
+              "ceiling",
+              "40-60%",
+              "baseline accuracy"
+            ]
+          },
+          "weight": 2
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "failure mode",
+              "edge case",
+              "harder scenario"
+            ]
+          },
+          "weight": 1.5
+        }
+      ]
+    }
+  },
+  {
+    "id": "h041",
+    "group": "proc",
+    "prompt": "In a run with minibatch_size=6 and 20 train tasks, how many complete epochs happen in 12 iterations (assuming sequential sampling without replacement)? At what iteration does the second epoch start? Show the sampling math.",
+    "check": {
+      "type": "multi_criterion",
+      "criteria": [
+        {
+          "check": {
+            "type": "arithmetic_check",
+            "expected": 3.6,
+            "tolerance": 0.1
+          },
+          "weight": 2
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "20/6",
+              "3.33",
+              "epoch boundary"
+            ]
+          },
+          "weight": 1.5
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "iter 4",
+              "iteration 4",
+              "after 3"
+            ]
+          },
+          "weight": 2.5
+        }
+      ]
+    }
+  },
+  {
+    "id": "h042",
+    "group": "diag",
+    "prompt": "A user runs skill-opt with feedback_source=autonomous on a skill that generates poetry. The LLM-judge consistently gives scores of 0.9+ but the optimized skill produces noticeably worse poetry according to human reviewers. Diagnose this failure using concepts from rubrics.md and feedback-sources.md.",
+    "check": {
+      "type": "multi_criterion",
+      "criteria": [
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "judge drift",
+              "calibration",
+              "unreliable judge",
+              "judge not tracking"
+            ]
+          },
+          "weight": 2.5
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "autonomous",
+              "no user validation",
+              "no human"
+            ]
+          },
+          "weight": 1.5
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "programmatic",
+              "no ground truth",
+              "cannot mechanically verify"
+            ]
+          },
+          "weight": 1.5
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "user-suite",
+              "human",
+              "live"
+            ]
+          },
+          "weight": 1.5
+        }
+      ]
+    }
+  }
+]

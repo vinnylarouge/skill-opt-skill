@@ -1,0 +1,9 @@
+[
+  {
+    "op": "replace",
+    "location": "references/loop.md > Edit-Budget Enforcement > Count rule",
+    "old_text": "If exceeded, ask for a trimmed proposal.",
+    "new_text": "If exceeded, ask for a trimmed proposal (combine related ops into fewer, e.g. merge two adds into a single replace).",
+    "rationale": "h023 failure: model correctly identified the budget violation but answered 'trim' without suggesting the specific strategy of combining/merging ops. Adding parenthetical makes the combine strategy explicit."
+  }
+]

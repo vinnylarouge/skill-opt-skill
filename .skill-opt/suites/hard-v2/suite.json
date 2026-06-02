@@ -1,0 +1,319 @@
+{
+  "skill": "skill-opt",
+  "source": "autonomous",
+  "holdout_fraction": 0.3,
+  "total": 52,
+  "version": "hard-v2",
+  "notes": "Execution-backed validation suite. 6 families: exec (execution-backed), json (strict JSON output), token (token-limited), multiref (multi-doc synthesis), state (stateful fixture-backed), adv (adversarial retrieval). Target baseline 0.5-0.7.",
+  "tasks": [
+
+    {"id": "x000", "group": "exec",
+     "prompt": "Write a Python expression that computes the gate decision for: candidate_mean=0.82, best_so_far=0.79, margin=0.02. Print ONLY 'accept' or 'reject'.",
+     "check": {"type": "exec_python", "expected_output": "accept", "must_succeed": true}},
+
+    {"id": "x001", "group": "exec",
+     "prompt": "Write a Python expression that computes the gate decision for: candidate_mean=0.81, best_so_far=0.79, margin=0.02. Print ONLY 'accept' or 'reject'.",
+     "check": {"type": "exec_python", "expected_output": "reject", "must_succeed": true}},
+
+    {"id": "x002", "group": "exec",
+     "prompt": "Write Python code to compute: given max_ops=3, max_words=80, and edits=[{added:45, removed:20}, {added:30, removed:0}, {added:10, removed:15}], check if ops count passes AND net words passes. Print 'ops: PASS/FAIL' and 'words: PASS/FAIL' on separate lines.",
+     "check": {"type": "exec_python", "expected_contains": ["ops: pass", "words: pass"]}},
+
+    {"id": "x003", "group": "exec",
+     "prompt": "Write Python code to compute: given max_ops=3, max_words=80, and edits=[{added:60, removed:5}, {added:40, removed:0}, {added:25, removed:10}], check if net words passes. Print the net word count and 'PASS' or 'FAIL'.",
+     "check": {"type": "exec_python", "expected_contains": ["110", "fail"]}},
+
+    {"id": "x004", "group": "exec",
+     "prompt": "Write the exact ledger.py command to record a holdout evaluation for candidate version 'c3' at iteration 3 with scores [0.8, 1.0, 0.6, 0.9, 1.0, 0.7] against run directory './fixtures/run-alpha'.",
+     "check": {"type": "exec_ledger", "fixture": "run-alpha", "expected_contains": ["0.8"]}},
+
+    {"id": "x005", "group": "exec",
+     "prompt": "Write the exact ledger.py command to query what the current best version and score are for the run at './fixtures/run-alpha'.",
+     "check": {"type": "exec_ledger", "fixture": "run-alpha", "expected_contains": ["c1", "0.75"]}},
+
+    {"id": "x006", "group": "exec",
+     "prompt": "Write Python to compute how many complete epochs occur in 15 iterations with minibatch_size=4 and 18 train tasks (sequential sampling without replacement). Print the number of complete epochs as a float.",
+     "check": {"type": "exec_python", "expected_contains": ["3.3"]}},
+
+    {"id": "x007", "group": "exec",
+     "prompt": "Write Python to simulate early_stop_patience=3 with this gate history: ['accept','reject','reject','accept','reject','reject','reject']. Print the iteration number (1-indexed) where early stop fires.",
+     "check": {"type": "exec_python", "expected_output": "7"}},
+
+    {"id": "x008", "group": "exec",
+     "prompt": "Write Python: given holdout_fraction=0.4 and total_tasks=35, compute how many tasks go to holdout and how many to train (use round() for holdout, remainder to train). Print 'holdout: N, train: M'.",
+     "check": {"type": "exec_python", "expected_output": "holdout: 14, train: 21"}},
+
+    {"id": "x009", "group": "exec",
+     "prompt": "Write Python that reads the ledger.csv at './fixtures/run-delta/ledger.csv' and computes: (1) total number of gate decisions, (2) number of accepts, (3) number of rejects. Print each on its own line as 'gates: N', 'accepts: N', 'rejects: N'.",
+     "check": {"type": "exec_python", "expected_contains": ["gates: 4", "accepts: 1", "rejects: 3"]}},
+
+    {"id": "x010", "group": "json",
+     "prompt": "Generate a valid config.yml as JSON (not YAML) for: target_skill='my-agent/SKILL.md', feedback_source=user-suite, max_iterations=20, edit_budget with max_ops=5 and max_words=120, holdout_fraction=0.35. Include ALL fields with their values (defaults where not specified).",
+     "check": {"type": "json_schema", "schema": {
+       "required_keys": ["target_skill", "feedback_source", "max_iterations", "edit_budget", "holdout_fraction", "edit_references", "feedback_timing", "output_mode", "early_stop_patience", "minibatch_size", "gate_margin", "parallelism", "edit_panel", "validation_depth"],
+       "values": {"target_skill": "my-agent/SKILL.md", "feedback_source": "user-suite", "max_iterations": [20, "20"], "holdout_fraction": [0.35, "0.35"]}
+     }}},
+
+    {"id": "x011", "group": "json",
+     "prompt": "Generate a valid edit.json (as JSON array) for this scenario: Replace the sentence 'Use default settings' with 'Configure according to the project requirements', and add a new paragraph 'Always validate inputs before processing.' after the introduction section. Include op, location, content, and rationale for each.",
+     "check": {"type": "json_schema", "schema": {
+       "min_items": 2,
+       "required_keys": ["op", "location", "content", "rationale"]
+     }}},
+
+    {"id": "x012", "group": "json",
+     "prompt": "Generate a valid suite.json structure for a 15-task suite with skill='data-parser', source='proposed-ratified', holdout_fraction=0.3. Include at least 3 example tasks with id, group, prompt, and check fields. The check should use type 'contains_all_lower' with patterns.",
+     "check": {"type": "json_schema", "schema": {
+       "required_keys": ["skill", "source", "holdout_fraction", "total", "tasks"],
+       "values": {"skill": "data-parser", "source": "proposed-ratified", "total": [15, "15"]},
+       "min_items": 3
+     }}},
+
+    {"id": "x013", "group": "json",
+     "prompt": "Generate a valid memory/rejected-edits.md entry as JSON with fields: iter (integer), decision ('reject'), delta (float, negative), edit_ops (array of op summaries), reason (string), evidence_needed (string). Use iter=5, delta=-0.04, with 2 edit ops.",
+     "check": {"type": "json_schema", "schema": {
+       "required_keys": ["iter", "decision", "delta", "edit_ops", "reason", "evidence_needed"],
+       "types": {"iter": "int", "delta": "float", "edit_ops": "list"},
+       "values": {"iter": [5, "5"], "decision": "reject"}
+     }}},
+
+    {"id": "x014", "group": "json",
+     "prompt": "Generate the JSON that ledger.py would output for a 'best' query on a run where v0 scored 0.65, c1 was accepted with 0.72, and c2 was accepted with 0.68 on holdout. Output format: {\"best_version\": \"...\", \"best_score\": ...}",
+     "check": {"type": "json_schema", "schema": {
+       "required_keys": ["best_version", "best_score"],
+       "values": {"best_version": "c1", "best_score": [0.72, "0.72"]}
+     }}},
+
+    {"id": "x015", "group": "token",
+     "prompt": "In exactly 10 words or fewer: what does the gate_margin config parameter do?",
+     "check": {"type": "token_limit", "max_tokens": 12, "correctness": {"type": "contains_all_lower", "patterns": ["candidate", "beat", "best"]}}},
+
+    {"id": "x016", "group": "token",
+     "prompt": "In one short sentence (max 15 words): what is the 'frozen target' discipline?",
+     "check": {"type": "token_limit", "max_tokens": 18, "correctness": {"type": "contains_all_lower", "patterns": ["subagent", "skill", "task"]}}},
+
+    {"id": "x017", "group": "token",
+     "prompt": "List the 5 SkillOpt mechanisms in exactly 5 comma-separated words. Nothing else.",
+     "check": {"type": "token_limit", "max_tokens": 8, "correctness": {"type": "contains_all_lower", "patterns": ["rollout", "reflect", "edit", "gate", "memory"]}}},
+
+    {"id": "x018", "group": "token",
+     "prompt": "What are the 7 ledger.csv columns? Reply with ONLY the comma-separated column names, no explanation.",
+     "check": {"type": "token_limit", "max_tokens": 10, "correctness": {"type": "contains_all_lower", "patterns": ["iter", "kind", "version", "split", "mean_score", "n", "decision"]}}},
+
+    {"id": "x019", "group": "token",
+     "prompt": "In under 20 words: why must the v0 holdout eval be recorded before the first gate call?",
+     "check": {"type": "token_limit", "max_tokens": 22, "correctness": {"type": "contains_any_lower", "patterns": ["fail-open", "unconditional", "baseline", "best() returns none"]}}},
+
+    {"id": "x020", "group": "token",
+     "prompt": "Complete this sentence in max 8 words: 'The edit budget prevents...'",
+     "check": {"type": "token_limit", "max_tokens": 10, "correctness": {"type": "contains_any_lower", "patterns": ["catastrophic", "overwrite", "overwrit"]}}},
+
+    {"id": "x021", "group": "token",
+     "prompt": "Name the 4 feedback_source modes. Just the values, comma-separated, no explanation.",
+     "check": {"type": "token_limit", "max_tokens": 6, "correctness": {"type": "contains_all_lower", "patterns": ["proposed-ratified", "autonomous", "user-suite", "live"]}}},
+
+    {"id": "x022", "group": "token",
+     "prompt": "What is the default value of minibatch_size? Reply with just the number.",
+     "check": {"type": "exact_output", "expected": "6", "normalize": "first_word"}},
+
+    {"id": "x023", "group": "multiref",
+     "prompt": "The skill-opt system uses 'slow updates' from the SkillOpt paper. Explain: (1) which file implements it, (2) what the paper calls this mechanism, (3) the specific threshold for re-proposing rejected edits, (4) what rubrics.md says about programmatic vs LLM-judge reliability. Combine all four points.",
+     "check": {"type": "multi_doc_synthesis", "requirements": [
+       {"source": "loop.md", "patterns": ["rejected-edits.md", "memory"], "min_hits": 1},
+       {"source": "fidelity.md", "patterns": ["memory", "slow update", "plasticity"], "min_hits": 1},
+       {"source": "loop.md", "patterns": ["3", "three", "≥3"], "min_hits": 1},
+       {"source": "rubrics.md", "patterns": ["deterministic", "trustworthy", "no judge drift", "ground truth"], "min_hits": 1}
+     ]}},
+
+    {"id": "x024", "group": "multiref",
+     "prompt": "Cross-reference fidelity.md and feedback-sources.md: For the 'Held-out Gate' mechanism, (1) what does the paper define it as, (2) how is it implemented here, (3) which feedback_source mode provides the 'strongest signal' for the gate, and (4) what metric validates the judge at finalize?",
+     "check": {"type": "multi_doc_synthesis", "requirements": [
+       {"source": "fidelity.md", "patterns": ["held-out", "selection performance", "never gate on train"], "min_hits": 2},
+       {"source": "fidelity.md", "patterns": ["ledger.py gate", "deterministic", "arithmetic"], "min_hits": 1},
+       {"source": "feedback-sources.md", "patterns": ["user-suite", "strongest", "programmatic"], "min_hits": 2},
+       {"source": "feedback-sources.md", "patterns": ["spearman", "0.7", "calibration"], "min_hits": 1}
+     ]}},
+
+    {"id": "x025", "group": "multiref",
+     "prompt": "Combining rubrics.md and the main SKILL.md Loop section: If you're building a task suite and want baseline accuracy around 40-60%, what does the suite need (from rubrics.md), and how does the Loop handle the case where a minibatch has all successes (from SKILL.md's Reflect phase)?",
+     "check": {"type": "multi_doc_synthesis", "requirements": [
+       {"source": "rubrics.md", "patterns": ["40", "60", "failure mode", "headroom"], "min_hits": 2},
+       {"source": "rubrics.md", "patterns": ["easy", "hard", "spectrum", "baseline should pass"], "min_hits": 1},
+       {"source": "SKILL.md", "patterns": ["success", "failure", "separately"], "min_hits": 2}
+     ]}},
+
+    {"id": "x026", "group": "multiref",
+     "prompt": "The config has edit_panel=3, parallelism=4, and gate_margin=0.05. Cross-referencing loop.md's edit_panel section, parallelism section, and gate margin section: Describe the EXACT sequence of events during the GATE phase of one iteration. How many subagents, what files, and what's the acceptance criterion?",
+     "check": {"type": "multi_doc_synthesis", "requirements": [
+       {"source": "loop.md/edit_panel", "patterns": ["3 candidates", "candidate-01", "candidate-02", "all k candidates", "keep best", "highest holdout"], "min_hits": 2},
+       {"source": "loop.md/parallelism", "patterns": ["4", "concurrent", "unique leaf", "no collision"], "min_hits": 1},
+       {"source": "loop.md/gate", "patterns": ["0.05", "margin", "strictly", "best_so_far"], "min_hits": 2}
+     ]}},
+
+    {"id": "x027", "group": "state",
+     "prompt": "Examine the run at fixtures/run-alpha. Based on its ledger.csv and config.yml: (1) What is the current best version and score? (2) How many non-improving rounds have occurred since the last accept? (3) Will the next non-improving round trigger early stop?",
+     "check": {"type": "composite", "criteria": [
+       {"check": {"type": "contains_all_lower", "patterns": ["c1", "0.75"]}, "weight": 2},
+       {"check": {"type": "contains_any_lower", "patterns": ["2", "two"]}, "weight": 2},
+       {"check": {"type": "contains_any_lower", "patterns": ["yes", "will trigger", "fires", "patience=3"]}, "weight": 2}
+     ]}},
+
+    {"id": "x028", "group": "state",
+     "prompt": "Examine fixtures/run-gamma. Its ledger.csv shows iter 2 train eval recorded but no holdout eval for iter 2. A candidate exists at candidates/iter-02/. What is the EXACT next action the resume protocol should take? Be specific about what command runs.",
+     "check": {"type": "composite", "criteria": [
+       {"check": {"type": "contains_any_lower", "patterns": ["holdout rollout", "run holdout", "rollout over holdout", "gate", "re-run gating"]}, "weight": 3},
+       {"check": {"type": "contains_any_lower", "patterns": ["c2", "candidate", "iter-02", "iter 2"]}, "weight": 1},
+       {"check": {"type": "contains_any_lower", "patterns": ["ledger.py", "record", "gate"]}, "weight": 2}
+     ]}},
+
+    {"id": "x029", "group": "state",
+     "prompt": "Examine fixtures/run-delta. Its holdout has been at 1.000000 for iterations 2, 3, and 4 (all rejected as ties). The config has early_stop_patience=3. Should the run stop? What is the patience counter value?",
+     "check": {"type": "composite", "criteria": [
+       {"check": {"type": "contains_any_lower", "patterns": ["yes", "should stop", "stop", "fires"]}, "weight": 3},
+       {"check": {"type": "contains_any_lower", "patterns": ["3", "three", "patience"]}, "weight": 2},
+       {"check": {"type": "contains_any_lower", "patterns": ["saturat", "tie", "1.0", "cannot improve"]}, "weight": 1}
+     ]}},
+
+    {"id": "x030", "group": "state",
+     "prompt": "Examine fixtures/run-beta's config.yml. Given its edit_budget (max_ops=2, max_words=50), gate_margin=0.05, and edit_panel=2: If a candidate scores 0.670 on holdout and the baseline is 0.625, will it be accepted? Show the arithmetic.",
+     "check": {"type": "composite", "criteria": [
+       {"check": {"type": "contains_any_lower", "patterns": ["reject", "rejected", "not accepted"]}, "weight": 3},
+       {"check": {"type": "contains_any_lower", "patterns": ["0.670", "0.67"]}, "weight": 1},
+       {"check": {"type": "contains_any_lower", "patterns": ["0.675", "0.625 + 0.05", "0.625+0.05"]}, "weight": 2},
+       {"check": {"type": "contains_any_lower", "patterns": ["not >", "false", "does not beat", "below"]}, "weight": 3}
+     ]}},
+
+    {"id": "x031", "group": "state",
+     "prompt": "Look at fixtures/run-alpha/memory/rejected-edits.md. The iter-03 rejection says the edit was rejected because of a tie (score 0.750 = best 0.750). According to the slow-update policy, how many more minibatches of evidence are needed before the 'Common pitfalls' addition can be re-proposed? (It was rejected at iter 3, current iter would be 4.)",
+     "check": {"type": "composite", "criteria": [
+       {"check": {"type": "contains_any_lower", "patterns": ["3", "three", "at least 3"]}, "weight": 3},
+       {"check": {"type": "contains_any_lower", "patterns": ["subsequent", "rollout", "minibatch", "evidence"]}, "weight": 2}
+     ]}},
+
+    {"id": "x032", "group": "state",
+     "prompt": "For fixtures/run-beta with edit_panel=2 and parallelism=4: In the GATE phase of iteration 1, how many TOTAL fresh subagent rollouts will be dispatched? (The holdout has 10 tasks based on the baseline eval having n=10.)",
+     "check": {"type": "exec_python", "expected_output": "20", "must_succeed": true}},
+
+    {"id": "x033", "group": "adv",
+     "prompt": "The skill document mentions 'gate_margin' in both the questionnaire table (main SKILL.md) and the Gate Margin section of loop.md. One says 'held-out margin to accept; passed to ledger.py gate --margin'. The other says 'candidate must beat best_so_far by strictly more than this margin'. Are these consistent? What's the EXACT comparison operator used?",
+     "check": {"type": "composite", "criteria": [
+       {"check": {"type": "contains_any_lower", "patterns": ["consistent", "yes", "same"]}, "weight": 1},
+       {"check": {"type": "contains_any_lower", "patterns": [">", "strictly greater", "strict"]}, "weight": 3},
+       {"check": {"type": "contains_any_lower", "patterns": ["not >=", "not greater-or-equal", "tie is rejected", "tie rejected"]}, "weight": 2}
+     ]}},
+
+    {"id": "x034", "group": "adv",
+     "prompt": "The skill says 'early_stop_patience: 3 — stop after K gated rounds with no improvement' in the questionnaire. But loop.md says 'Stop after K consecutive gated rounds with no improvement.' Is the word 'consecutive' important? If iter 1 rejects, iter 2 accepts, iter 3 rejects — what is the patience counter after iter 3?",
+     "check": {"type": "composite", "criteria": [
+       {"check": {"type": "contains_any_lower", "patterns": ["consecutive", "resets"]}, "weight": 3},
+       {"check": {"type": "contains_any_lower", "patterns": ["1", "one", "counter = 1", "counter=1"]}, "weight": 3}
+     ]}},
+
+    {"id": "x035", "group": "adv",
+     "prompt": "The fidelity map says the rollout subagent 'receives only {current skill text, task}'. The main SKILL.md Disciplines section says 'receives exactly two inputs: the current skill text and the task prompt. Nothing else is passed to the subagent.' Do these conflict? What about the edit_references=true case — does the 'skill text' include references?",
+     "check": {"type": "composite", "criteria": [
+       {"check": {"type": "contains_any_lower", "patterns": ["no conflict", "consistent", "same thing", "do not conflict"]}, "weight": 2},
+       {"check": {"type": "contains_any_lower", "patterns": ["edit_references", "references", "bundle", "includes"]}, "weight": 2},
+       {"check": {"type": "contains_any_lower", "patterns": ["skill text", "full packet", "entire skill"]}, "weight": 2}
+     ]}},
+
+    {"id": "x036", "group": "adv",
+     "prompt": "The Loop pseudocode shows 'SCORE: ledger.py record --split train'. But the Gate section says 'ledger.py gate has ALREADY written the kind=gate decision row. Do not call record for the decision.' Is there a contradiction? When IS record called vs when is gate called?",
+     "check": {"type": "composite", "criteria": [
+       {"check": {"type": "contains_any_lower", "patterns": ["no contradiction", "not a contradiction", "different purposes", "no conflict"]}, "weight": 2},
+       {"check": {"type": "contains_any_lower", "patterns": ["record", "eval", "kind=eval"]}, "weight": 2},
+       {"check": {"type": "contains_any_lower", "patterns": ["gate", "kind=gate", "decision"]}, "weight": 2}
+     ]}},
+
+    {"id": "x037", "group": "adv",
+     "prompt": "The config table shows 'gate_margin: 0.0' as default. Loop.md says 'candidate must beat best_so_far by strictly more than this margin.' With margin=0.0, does 'strictly more than 0.0' mean any improvement suffices, or is there an edge case? What happens when candidate equals best_so_far exactly?",
+     "check": {"type": "composite", "criteria": [
+       {"check": {"type": "contains_any_lower", "patterns": ["reject", "rejected", "tie is rejected"]}, "weight": 3},
+       {"check": {"type": "contains_any_lower", "patterns": ["> not >=", "strict >", "strictly greater", "not greater-or-equal"]}, "weight": 2},
+       {"check": {"type": "contains_any_lower", "patterns": ["equal", "tie", "same score"]}, "weight": 1}
+     ]}},
+
+    {"id": "x038", "group": "adv",
+     "prompt": "Loop.md has a 'Version-label convention' note that says 'On-disk skill files (skill/v0.md, skill/v1.md, ...) are named independently of these ledger labels.' But the Gate section says 'Copy candidates/iter-NN/candidate.md → skill/v(K+1).md'. Is vK+1 the same as the cN label? Explain the mapping.",
+     "check": {"type": "composite", "criteria": [
+       {"check": {"type": "contains_any_lower", "patterns": ["different", "independent", "not the same", "named independently"]}, "weight": 3},
+       {"check": {"type": "contains_any_lower", "patterns": ["c1", "c2", "cn"]}, "weight": 1},
+       {"check": {"type": "contains_any_lower", "patterns": ["v1", "v2", "v(k+1)", "sequential", "acceptance count"]}, "weight": 2}
+     ]}},
+
+    {"id": "x039", "group": "exec",
+     "prompt": "Write Python code that implements the EXACT decide() logic from ledger.py: given cand_score (float or None), best_score (float or None), and margin (float), print 'accept' or 'reject'. Test it with: cand=0.85, best=None, margin=0.0 then cand=None, best=0.7, margin=0.0.",
+     "check": {"type": "exec_python", "expected_contains": ["accept", "reject"]}},
+
+    {"id": "x040", "group": "exec",
+     "prompt": "Write Python that parses a ledger.csv string and computes best_so_far (max holdout mean across accepted versions including v0). CSV content:\niter,kind,version,split,mean_score,n,decision\n0,eval,v0,holdout,0.600000,8,\n1,eval,c1,holdout,0.700000,8,\n1,gate,c1,holdout,0.700000,,accept\n2,eval,c2,holdout,0.650000,8,\n2,gate,c2,holdout,0.650000,,reject\n\nPrint the best version and score.",
+     "check": {"type": "exec_python", "expected_contains": ["c1", "0.7"]}},
+
+    {"id": "x041", "group": "json",
+     "prompt": "Generate a JSON object representing a single ledger.csv row for: iteration 2, kind=eval, version=c2, split=holdout, mean_score=0.834, n=12, no decision. Use exact field names from the skill document.",
+     "check": {"type": "json_schema", "schema": {
+       "required_keys": ["iter", "kind", "version", "split", "mean_score", "n"],
+       "values": {"iter": [2, "2"], "kind": "eval", "version": "c2", "split": "holdout"}
+     }}},
+
+    {"id": "x042", "group": "json",
+     "prompt": "Generate valid JSON for a judge calibration report with fields: rho (Spearman correlation), n (number of dual-scored tasks), threshold, status ('PASS' or 'FAIL'). Use rho=0.63, n=18, threshold=0.70.",
+     "check": {"type": "json_schema", "schema": {
+       "required_keys": ["rho", "n", "threshold", "status"],
+       "values": {"status": "fail", "n": [18, "18"]}
+     }}},
+
+    {"id": "x043", "group": "token",
+     "prompt": "In max 25 words: explain the relationship between edit_budget and 'textual learning rate'. Why is this analogy used?",
+     "check": {"type": "token_limit", "max_tokens": 28, "correctness": {"type": "contains_all_lower", "patterns": ["prevent", "overwrite"]}}},
+
+    {"id": "x044", "group": "token",
+     "prompt": "In max 20 words: what happens during the MEMORY phase after a gate rejection?",
+     "check": {"type": "token_limit", "max_tokens": 23, "correctness": {"type": "contains_all_lower", "patterns": ["rejected-edits", "append"]}}},
+
+    {"id": "x045", "group": "multiref",
+     "prompt": "Combining feedback-sources.md's 'live' mode with loop.md's 'Minibatch Sampling': In live mode, is 'sequential sampling without replacement within each epoch' applicable? Why or why not? What replaces it?",
+     "check": {"type": "multi_doc_synthesis", "requirements": [
+       {"source": "feedback-sources.md", "patterns": ["rolling window", "real tasks", "logged"], "min_hits": 1},
+       {"source": "loop.md", "patterns": ["sequential", "without replacement", "epoch"], "min_hits": 1},
+       {"source": "synthesis", "patterns": ["not applicable", "no pre-built", "arrive", "one at a time"], "min_hits": 1}
+     ]}},
+
+    {"id": "x046", "group": "state",
+     "prompt": "Write the EXACT ledger.py gate command (with all required arguments) that should be run next for fixtures/run-gamma, given that a candidate c2 exists but hasn't been gated yet. Use the fixture's actual config values.",
+     "check": {"type": "exec_ledger", "fixture": "run-gamma", "expected_contains": ["reject"]}},
+
+    {"id": "x047", "group": "adv",
+     "prompt": "The SKILL.md says 'Consult memory/rejected-edits.md before every edit proposal — do not re-propose known-bad edits without new evidence.' But what counts as a 'known-bad edit'? If an edit was rejected because holdout was SATURATED (score tied at 1.0), is it 'known-bad' or should it be retried immediately since it wasn't actually bad?",
+     "check": {"type": "composite", "criteria": [
+       {"check": {"type": "contains_any_lower", "patterns": ["still rejected", "still known-bad", "cannot retry immediately", "still in rejected-edits"]}, "weight": 2},
+       {"check": {"type": "contains_any_lower", "patterns": ["3", "evidence", "minibatch", "subsequent rollout"]}, "weight": 2},
+       {"check": {"type": "contains_any_lower", "patterns": ["saturat", "tie", "holdout"]}, "weight": 1}
+     ]}},
+
+    {"id": "x048", "group": "exec",
+     "prompt": "Write Python code that validates an edit_budget check. Given ops=[{'op':'replace','added':25,'removed':10},{'op':'add','added':35,'removed':0},{'op':'replace','added':20,'removed':30}] with max_ops=3, max_words=80, compute and print: num_ops, words_added, words_removed, net_words, ops_pass (bool), words_pass (bool).",
+     "check": {"type": "exec_python", "expected_contains": ["num_ops: 3", "words_added: 80", "words_removed: 40", "net_words: 40", "ops_pass: true", "words_pass: true"]}},
+
+    {"id": "x049", "group": "state",
+     "prompt": "Examine fixtures/run-alpha's rejected-edits.md. Both rejected edits need '3 minibatches showing this failure pattern' to retry. The ledger shows train evals at iters 1, 2, 3 (all for the current best version). If the SAME failure pattern appeared in ALL three of those train minibatches, can the iter-02 rejected edit be re-proposed at iter 4?",
+     "check": {"type": "composite", "criteria": [
+       {"check": {"type": "contains_any_lower", "patterns": ["cannot", "not yet", "cannot re-propose", "no,"]}, "weight": 3},
+       {"check": {"type": "contains_any_lower", "patterns": ["1", "one", "only iter 3", "only 1"]}, "weight": 2},
+       {"check": {"type": "contains_any_lower", "patterns": ["subsequent", "after", "since rejection"]}, "weight": 1}
+     ]}},
+
+    {"id": "x050", "group": "multiref",
+     "prompt": "A run uses feedback_source=autonomous and the LLM-judge gives calibration rho=0.55 at finalize. Cross-referencing rubrics.md's calibration section and feedback-sources.md's autonomous section: (1) does calibration pass, (2) what specific actions should be taken, (3) can the optimization gains be trusted?",
+     "check": {"type": "multi_doc_synthesis", "requirements": [
+       {"source": "rubrics.md", "patterns": ["0.7", "threshold", "fail", "below"], "min_hits": 2},
+       {"source": "rubrics.md", "patterns": ["revise", "rubric", "user-suite", "concrete"], "min_hits": 1},
+       {"source": "feedback-sources.md", "patterns": ["autonomous", "no user validation", "judge drift", "risk"], "min_hits": 1},
+       {"source": "synthesis", "patterns": ["not trust", "cannot trust", "do not trust", "cannot be trusted", "should not be trusted"], "min_hits": 1}
+     ]}},
+
+    {"id": "x051", "group": "exec",
+     "prompt": "Write Python that implements the full gate logic: read fixtures/run-alpha/ledger.csv, find best_so_far, then check if a new candidate with holdout_mean=0.76 and margin=0.0 would be accepted. Print 'accept' or 'reject' and the reason.",
+     "check": {"type": "exec_python", "expected_contains": ["accept", "0.75"]}}
+  ]
+}

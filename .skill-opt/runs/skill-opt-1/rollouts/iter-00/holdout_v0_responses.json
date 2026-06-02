@@ -1,0 +1,12 @@
+{
+  "t000": "`autonomous`",
+  "t005": "3",
+  "t007": "`candidates/iter-03/candidate.md`",
+  "t010": "`skill/v0.md`",
+  "t016": "SUCCESS and FAILURE sets.",
+  "t018": "N",
+  "t021": "N",
+  "t023": "Reject",
+  "t024": "Accept",
+  "t029": "Resume runs scoring on that leaf to produce `score.json`."
+}

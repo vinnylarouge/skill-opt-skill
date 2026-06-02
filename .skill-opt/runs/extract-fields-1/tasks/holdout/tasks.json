@@ -1,0 +1,46 @@
+[
+  {
+    "id": "t010",
+    "text": "LexCorp statement 2026-9-2 \u00a3415.50 \u2014 retainer Q3.",
+    "gold": {
+      "vendor": "lexcorp",
+      "date": "2026-09-02",
+      "amount": 415.5,
+      "currency": "gbp",
+      "note": "retainer q3"
+    }
+  },
+  {
+    "id": "t014",
+    "text": "Sterling Cooper paid \u00a31,080.00 on 28 Feb 2026, memo: ad campaign.",
+    "gold": {
+      "vendor": "sterling cooper",
+      "date": "2026-02-28",
+      "amount": 1080.0,
+      "currency": "gbp",
+      "note": "ad campaign"
+    }
+  },
+  {
+    "id": "t016",
+    "text": "Vandelay Industries billed $499.99 on Oct 10, 2026, note: sample order.",
+    "gold": {
+      "vendor": "vandelay industries",
+      "date": "2026-10-10",
+      "amount": 499.99,
+      "currency": "usd",
+      "note": "sample order"
+    }
+  },
+  {
+    "id": "t018",
+    "text": "Initech (2nd invoice) \u20ac900 on 2026-4-15, ref: server migration.",
+    "gold": {
+      "vendor": "initech",
+      "date": "2026-04-15",
+      "amount": 900.0,
+      "currency": "eur",
+      "note": "server migration"
+    }
+  }
+]

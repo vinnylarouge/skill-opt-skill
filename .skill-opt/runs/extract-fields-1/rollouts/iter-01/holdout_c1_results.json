@@ -1,0 +1,6 @@
+[
+  {"id": "t010", "vendor": "LexCorp", "date": "2026-09-02", "amount": "415.50", "currency": "£", "note": "retainer Q3"},
+  {"id": "t014", "vendor": "Sterling Cooper", "date": "2026-02-28", "amount": "1,080.00", "currency": "£", "note": "ad campaign"},
+  {"id": "t016", "vendor": "Vandelay Industries", "date": "2026-10-10", "amount": "499.99", "currency": "$", "note": "sample order"},
+  {"id": "t018", "vendor": "Initech (2nd invoice)", "date": "2026-04-15", "amount": "900", "currency": "€", "note": "server migration"}
+]

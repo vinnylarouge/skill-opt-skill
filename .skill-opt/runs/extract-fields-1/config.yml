@@ -1,0 +1,14 @@
+target_skill: playground/seed-skill/SKILL.md
+feedback_source: user-suite     # programmatic checker => ground-truth scoring
+feedback_timing: autonomous
+output_mode: save-as-new
+max_iterations: 3               # SCALED proof run
+early_stop_patience: 3
+edit_budget: {max_ops: 3, max_words: 80}
+minibatch_size: 4
+holdout_fraction: 0.2           # 4 holdout of 20
+gate_margin: 0.0
+checkpoint_every: 1
+parallelism: 4
+edit_panel: 1
+validation_depth: self-contained

@@ -1,0 +1,1 @@
+{"iter":2,"ops":[{"op":"add","target":"## Normalization / Currency","rationale":"holdout+train currency misses (symbols copied); add ISO-4217 lowercase code rule (1 op, ~35 words)"}],"edit_budget":{"max_ops":3,"max_words":80}}

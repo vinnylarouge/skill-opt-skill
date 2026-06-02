@@ -1,0 +1,20 @@
+[
+  {
+    "op": "replace",
+    "location": "Up-Front Questionnaire, gate_margin row",
+    "content": "candidate must beat the best by strictly more than this margin",
+    "rationale": "Iter-04 changed 'held-out margin to accept' to 'beat the best by at least this margin'. This introduced inconsistency — 'at least' (>=) vs loop.md's 'strictly more than' (>). Fixing to match loop.md while keeping 'beat the best' phrasing."
+  },
+  {
+    "op": "add",
+    "location": "After Up-Front Questionnaire table, before The Loop section",
+    "content": "**One-line summaries:** gate_margin = how much the candidate must beat the best by. early_stop_patience = consecutive rejections before the loop halts (returns the iteration number).",
+    "rationale": "One final attempt at terminology anchoring. Placing immediately after the questionnaire table where parameter definitions live. Adding 'returns the iteration number' for early_stop to encourage bare-integer output in code. 'beat the best' appears one more time."
+  },
+  {
+    "op": "add",
+    "location": "After 'Run Directory Layout', before 'Resume'",
+    "content": "## ledger.py CLI Reference\n\n```\nledger.py record --run <path> --iter <N> --version <label> --split train|holdout --scores <comma-separated-floats>\nledger.py gate   --run <path> --iter <N> --candidate <cN> --margin <float>\nledger.py best   --run <path>\n```\n\n`--scores` takes comma-separated floats, e.g. `--scores \"0.8,1.0,0.6\"`.",
+    "rationale": "Retained from prior iterations."
+  }
+]

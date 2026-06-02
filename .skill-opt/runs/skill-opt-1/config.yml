@@ -1,0 +1,15 @@
+target_skill: skill/SKILL.md      # dogfood: optimize skill-opt's own SKILL.md
+edit_references: true             # references/ are part of the skill packet — let them evolve too
+feedback_source: autonomous       # fully automated; programmatic checker is ground truth
+feedback_timing: autonomous
+output_mode: save-as-new          # do not touch the canonical skill dir; save to skill-opt-opt/
+max_iterations: 3                 # dogfood scaled run
+early_stop_patience: 2
+edit_budget: {max_ops: 3, max_words: 80}
+minibatch_size: 6
+holdout_fraction: 0.3             # 10 holdout / 20 train (stratified by group)
+gate_margin: 0.0
+checkpoint_every: 1
+parallelism: 6
+edit_panel: 1
+validation_depth: self-contained
