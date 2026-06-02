@@ -1,0 +1,1468 @@
+[
+  {
+    "id": "h000",
+    "group": "proc",
+    "prompt": "Trace the SETUP phase for a fresh run with feedback_source=user-suite, holdout_fraction=0.4, and 25 user-provided tasks. List in order: (1) what files/dirs get created, (2) how many tasks end up in train vs holdout, (3) what gets recorded in ledger.csv. Be precise about paths and counts.",
+    "check": {
+      "type": "multi_criterion",
+      "criteria": [
+        {
+          "check": {
+            "type": "contains_all_lower",
+            "patterns": [
+              "config.yml",
+              "tasks/train",
+              "tasks/holdout",
+              "skill/v0.md"
+            ]
+          },
+          "weight": 2
+        },
+        {
+          "check": {
+            "type": "contains_all_lower",
+            "patterns": [
+              "15",
+              "10"
+            ]
+          },
+          "weight": 2
+        },
+        {
+          "check": {
+            "type": "contains_all_lower",
+            "patterns": [
+              "ledger",
+              "v0",
+              "holdout"
+            ]
+          },
+          "weight": 1
+        },
+        {
+          "check": {
+            "type": "negation_aware",
+            "must": [
+              "suite.json"
+            ],
+            "must_not": [
+              "rollout",
+              "reflect",
+              "edit"
+            ],
+            "presence_weight": 0.5,
+            "absence_weight": 0.5
+          },
+          "weight": 1
+        }
+      ]
+    }
+  },
+  {
+    "id": "h002",
+    "group": "proc",
+    "prompt": "A run is at the start of iteration 4. The current best is v2 (accepted at iter 2). Iterations 3's candidate c3 was rejected. The optimizer proposes an edit similar to the one rejected at iter 3. What MUST happen before this edit can be proposed? What specific evidence is required? Quote the rule from the memory/slow-update policy.",
+    "check": {
+      "type": "multi_criterion",
+      "criteria": [
+        {
+          "check": {
+            "type": "contains_all_lower",
+            "patterns": [
+              "rejected-edits.md",
+              "read"
+            ]
+          },
+          "weight": 2
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "3 subsequent rollouts",
+              "3 minibatches",
+              "multiple subsequent",
+              "at least 3"
+            ]
+          },
+          "weight": 3
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "new evidence",
+              "failure pattern"
+            ]
+          },
+          "weight": 1
+        }
+      ]
+    }
+  },
+  {
+    "id": "h003",
+    "group": "proc",
+    "prompt": "Describe the exact sequence of ledger.py commands (with arguments) that execute during iteration 2, assuming run dir is `.skill-opt/runs/my-skill-1/`, the candidate version label is c2, and the minibatch has 6 tasks. Include both the train eval recording and the holdout gating.",
+    "check": {
+      "type": "multi_criterion",
+      "criteria": [
+        {
+          "check": {
+            "type": "contains_all_lower",
+            "patterns": [
+              "record",
+              "--version",
+              "v1",
+              "--split",
+              "train",
+              "--iter",
+              "2"
+            ]
+          },
+          "weight": 2
+        },
+        {
+          "check": {
+            "type": "contains_all_lower",
+            "patterns": [
+              "record",
+              "--version",
+              "c2",
+              "--split",
+              "holdout",
+              "--iter",
+              "2"
+            ]
+          },
+          "weight": 2
+        },
+        {
+          "check": {
+            "type": "contains_all_lower",
+            "patterns": [
+              "gate",
+              "--candidate",
+              "c2",
+              "--iter",
+              "2"
+            ]
+          },
+          "weight": 2
+        }
+      ]
+    }
+  },
+  {
+    "id": "h004",
+    "group": "proc",
+    "prompt": "After gate ACCEPTS candidate c3 at iteration 3 (the second acceptance, previous was c1\u2192v1 at iter 1), list ALL file-system writes that happen, with exact paths relative to the run dir. Include ledger, skill files, and memory updates.",
+    "check": {
+      "type": "multi_criterion",
+      "criteria": [
+        {
+          "check": {
+            "type": "contains_all_lower",
+            "patterns": [
+              "skill/v2.md",
+              "skill/current.md"
+            ]
+          },
+          "weight": 3
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "accepted-log.md",
+              "memory/accepted-log"
+            ]
+          },
+          "weight": 1.5
+        },
+        {
+          "check": {
+            "type": "negation_aware",
+            "must": [
+              "candidates/iter-03/candidate.md"
+            ],
+            "must_not": [],
+            "presence_weight": 1.0,
+            "absence_weight": 0.0
+          },
+          "weight": 1.5
+        }
+      ]
+    }
+  },
+  {
+    "id": "h005",
+    "group": "proc",
+    "prompt": "A run with early_stop_patience=2 has this ledger history: iter1 gate=accept, iter2 gate=reject, iter3 gate=accept, iter4 gate=reject, iter5 gate=reject. At which iteration does early stopping fire? Explain the counter reset logic.",
+    "check": {
+      "type": "multi_criterion",
+      "criteria": [
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "iter 5",
+              "iteration 5",
+              "after iter 5",
+              "fires at 5"
+            ]
+          },
+          "weight": 3
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "reset",
+              "counter resets",
+              "resets to 0",
+              "resets on accept"
+            ]
+          },
+          "weight": 2
+        }
+      ]
+    }
+  },
+  {
+    "id": "h006",
+    "group": "diag",
+    "prompt": "A run's ledger.csv shows: iter=1 kind=eval version=c1 split=holdout mean_score=0.85. But `ledger.py gate --iter 1 --candidate c1` outputs 'reject'. The config has gate_margin=0.0. The v0 holdout eval shows mean_score=0.90. Why was c1 rejected despite scoring 0.85?",
+    "check": {
+      "type": "multi_criterion",
+      "criteria": [
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "0.85 < 0.90",
+              "below best",
+              "below baseline",
+              "does not beat",
+              "must beat",
+              "v0 is 0.90",
+              "best_so_far",
+              "lower than"
+            ]
+          },
+          "weight": 3
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "strict",
+              "strictly greater",
+              "strictly more than",
+              ">"
+            ]
+          },
+          "weight": 2
+        }
+      ]
+    }
+  },
+  {
+    "id": "h007",
+    "group": "diag",
+    "prompt": "A user reports: 'My run accepted every single candidate across 8 iterations, holdout scores: 0.60, 0.62, 0.65, 0.63, 0.67, 0.64, 0.68, 0.66.' But looking at the trajectory, iter 4 scored 0.63 which is BELOW iter 3's 0.65. How is this possible? What invariant is being violated or what explains this?",
+    "check": {
+      "type": "multi_criterion",
+      "criteria": [
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "best_so_far",
+              "best()",
+              "max across accepted",
+              "best accepted version"
+            ]
+          },
+          "weight": 2
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "not all accepted",
+              "cannot accept",
+              "bug",
+              "impossible",
+              "violates",
+              "best should be 0.65"
+            ]
+          },
+          "weight": 3
+        }
+      ]
+    }
+  },
+  {
+    "id": "h008",
+    "group": "diag",
+    "prompt": "A run crashes mid-iteration 3 after writing `candidates/iter-03/candidate.md` and `edit.json` but BEFORE any holdout rollouts. On resume, what does the system detect and what does it do next? Walk through the resume protocol for this specific state.",
+    "check": {
+      "type": "multi_criterion",
+      "criteria": [
+        {
+          "check": {
+            "type": "contains_all_lower",
+            "patterns": [
+              "ledger",
+              "candidate"
+            ]
+          },
+          "weight": 1
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "no holdout rollout",
+              "no holdout scores",
+              "holdout not yet run"
+            ]
+          },
+          "weight": 2
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "re-run gating",
+              "run gating",
+              "rollout over holdout",
+              "gate the candidate"
+            ]
+          },
+          "weight": 3
+        }
+      ]
+    }
+  },
+  {
+    "id": "h010",
+    "group": "diag",
+    "prompt": "The gate at iter 2 calls `ledger.py gate --candidate c2 --iter 2` but gets 'accept' even though the candidate scored LOWER than baseline. Investigation reveals the v0 baseline holdout eval row is MISSING from ledger.csv. Explain the exact failure mode and what invariant was violated during SETUP.",
+    "check": {
+      "type": "multi_criterion",
+      "criteria": [
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "fail-open",
+              "unconditional",
+              "accepts unconditionally"
+            ]
+          },
+          "weight": 3
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "best() returns none",
+              "best_score is none",
+              "no baseline"
+            ]
+          },
+          "weight": 2
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "setup must record",
+              "v0 holdout eval must",
+              "invariant"
+            ]
+          },
+          "weight": 2
+        }
+      ]
+    }
+  },
+  {
+    "id": "h011",
+    "group": "diag",
+    "prompt": "A run uses `ledger.py record --version C2 --split holdout` (uppercase C) but then calls `ledger.py gate --candidate c2` (lowercase c). The gate rejects because it finds no holdout scores for 'c2'. Diagnose the exact cause citing the version-label convention.",
+    "check": {
+      "type": "multi_criterion",
+      "criteria": [
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "case mismatch",
+              "uppercase",
+              "exact version string",
+              "label mismatch",
+              "case-sensitive"
+            ]
+          },
+          "weight": 3
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "holdout_mean",
+              "looks up rows by exact",
+              "finds no scores"
+            ]
+          },
+          "weight": 2
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "convention",
+              "cn",
+              "c1, c2"
+            ]
+          },
+          "weight": 1
+        }
+      ]
+    }
+  },
+  {
+    "id": "h012",
+    "group": "config-gen",
+    "prompt": "Generate a complete config.yml for this scenario: A team wants to optimize their code-review skill. They have 40 existing test cases with gold answers. They want fully automated operation, are willing to wait for 20 iterations, want aggressive edits (up to 5 ops, 150 words), and want 3 candidate proposals per round to maximize diversity. They want to overwrite the original skill.",
+    "check": {
+      "type": "multi_criterion",
+      "criteria": [
+        {
+          "check": {
+            "type": "contains_all_lower",
+            "patterns": [
+              "user-suite",
+              "autonomous"
+            ]
+          },
+          "weight": 2
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "max_iterations: 20",
+              "max_iterations:20"
+            ]
+          },
+          "weight": 1
+        },
+        {
+          "check": {
+            "type": "contains_all_lower",
+            "patterns": [
+              "max_ops",
+              "5",
+              "max_words",
+              "150"
+            ]
+          },
+          "weight": 2
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "edit_panel: 3",
+              "edit_panel:3"
+            ]
+          },
+          "weight": 2
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "overwrite"
+            ]
+          },
+          "weight": 1
+        }
+      ]
+    }
+  },
+  {
+    "id": "h015",
+    "group": "config-gen",
+    "prompt": "What is the MINIMUM valid config.yml that will start a run? List only the required fields and explain which defaults kick in for everything else. If a field has no default and must be specified, mark it.",
+    "check": {
+      "type": "multi_criterion",
+      "criteria": [
+        {
+          "check": {
+            "type": "contains_all_lower",
+            "patterns": [
+              "target_skill"
+            ]
+          },
+          "weight": 3
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "required",
+              "no default",
+              "must be specified"
+            ]
+          },
+          "weight": 2
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "proposed-ratified",
+              "default"
+            ]
+          },
+          "weight": 1
+        }
+      ]
+    }
+  },
+  {
+    "id": "h016",
+    "group": "config-gen",
+    "prompt": "A user wants validation_depth=full-ablation. What does each validation_depth level do? For full-ablation specifically, describe what additional work happens compared to self-contained.",
+    "check": {
+      "type": "multi_criterion",
+      "criteria": [
+        {
+          "check": {
+            "type": "contains_all_lower",
+            "patterns": [
+              "map-only",
+              "self-contained",
+              "verifiers-env",
+              "full-ablation"
+            ]
+          },
+          "weight": 3
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "ablation",
+              "ablat",
+              "each edit",
+              "remove"
+            ]
+          },
+          "weight": 2
+        }
+      ]
+    }
+  },
+  {
+    "id": "h017",
+    "group": "gate-arith",
+    "prompt": "A run's ledger.csv has these holdout eval rows:\n  iter=0 version=v0 mean_score=0.700\n  iter=1 version=c1 mean_score=0.750 (gate: accept \u2192 becomes v1)\n  iter=2 version=c2 mean_score=0.740\n  iter=3 version=c3 mean_score=0.760\nWith gate_margin=0.0, what is the gate decision for c2 and c3? Show your arithmetic.",
+    "check": {
+      "type": "multi_criterion",
+      "criteria": [
+        {
+          "check": {
+            "type": "contains_all_lower",
+            "patterns": [
+              "c2",
+              "reject"
+            ]
+          },
+          "weight": 2
+        },
+        {
+          "check": {
+            "type": "contains_all_lower",
+            "patterns": [
+              "c3",
+              "accept"
+            ]
+          },
+          "weight": 2
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "0.740",
+              "0.74"
+            ]
+          },
+          "weight": 1
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "0.750",
+              "0.75",
+              "best_so_far"
+            ]
+          },
+          "weight": 1
+        }
+      ]
+    }
+  },
+  {
+    "id": "h020",
+    "group": "gate-arith",
+    "prompt": "The ledger.py gate function writes a kind=gate row to ledger.csv. If you also call `ledger.py record` for the same gate decision, what goes wrong? Explain the specific invariant about kind=eval vs kind=gate rows.",
+    "check": {
+      "type": "multi_criterion",
+      "criteria": [
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "duplicate",
+              "double",
+              "two rows",
+              "extra row"
+            ]
+          },
+          "weight": 2
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "record only writes kind=eval",
+              "record",
+              "eval"
+            ]
+          },
+          "weight": 2
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "cannot set the decision field",
+              "decision field",
+              "gate already wrote"
+            ]
+          },
+          "weight": 2
+        }
+      ]
+    }
+  },
+  {
+    "id": "h021",
+    "group": "gate-arith",
+    "prompt": "best() computes 'max held-out mean across all accepted versions'. A run has: v0=0.70, c1 accepted (v1)=0.80, c2 rejected, c3 accepted (v2)=0.75. What does best() return? Is v2 actually worse than v1?",
+    "check": {
+      "type": "multi_criterion",
+      "criteria": [
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "v1",
+              "0.80",
+              "0.8"
+            ]
+          },
+          "weight": 3
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "yes",
+              "v2 is worse",
+              "v2 scores lower",
+              "regression"
+            ]
+          },
+          "weight": 2
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "max across accepted",
+              "max",
+              "highest"
+            ]
+          },
+          "weight": 1
+        }
+      ]
+    }
+  },
+  {
+    "id": "h022",
+    "group": "budget",
+    "prompt": "An edit.json proposes: [{op: 'replace', old: 15 words, new: 40 words}, {op: 'add', content: 30 words}, {op: 'del', content: 20 words}]. The budget is max_ops=3, max_words=80. Does this pass? Show the calculation for net words changed.",
+    "check": {
+      "type": "multi_criterion",
+      "criteria": [
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "3 ops",
+              "3 operations",
+              "ops: 3",
+              "passes"
+            ]
+          },
+          "weight": 1.5
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "net",
+              "|words_added - words_removed|"
+            ]
+          },
+          "weight": 1.5
+        },
+        {
+          "check": {
+            "type": "arithmetic_check",
+            "expected": 35,
+            "tolerance": 5
+          },
+          "weight": 2
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "pass",
+              "within",
+              "under 80",
+              "satisfies"
+            ]
+          },
+          "weight": 1
+        }
+      ]
+    }
+  },
+  {
+    "id": "h023",
+    "group": "budget",
+    "prompt": "An optimizer proposes 4 edit operations in a single iteration with max_ops=3. The skill-opt discipline says to 'ask for a trimmed proposal.' But what if the 4th op is critical for the other 3 to make sense (they're interdependent)? What should the optimizer do according to the skill's slow-update policy?",
+    "check": {
+      "type": "multi_criterion",
+      "criteria": [
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "trim",
+              "reduce to 3",
+              "condense",
+              "combine",
+              "fewer ops"
+            ]
+          },
+          "weight": 2
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "combine",
+              "merge",
+              "condense into fewer",
+              "rewrite as fewer",
+              "single replace"
+            ]
+          },
+          "weight": 2
+        },
+        {
+          "check": {
+            "type": "contains_all_lower_and_not_any",
+            "must": [
+              "budget",
+              "non-negotiable"
+            ],
+            "must_not": [
+              "ignore the budget",
+              "override",
+              "exception to the rule"
+            ]
+          },
+          "weight": 2
+        }
+      ]
+    }
+  },
+  {
+    "id": "h024",
+    "group": "budget",
+    "prompt": "Net words calculation: edit 1 replaces a 50-word paragraph with a 20-word sentence. Edit 2 adds a new 45-word paragraph. The budget is max_words=80. Compute: (a) words added, (b) words removed, (c) net = |added - removed|. Does it pass?",
+    "check": {
+      "type": "multi_criterion",
+      "criteria": [
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "65",
+              "added: 65",
+              "words_added"
+            ]
+          },
+          "weight": 2
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "50",
+              "removed: 50",
+              "words_removed"
+            ]
+          },
+          "weight": 2
+        },
+        {
+          "check": {
+            "type": "arithmetic_check",
+            "expected": 15,
+            "tolerance": 1
+          },
+          "weight": 2
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "pass",
+              "within",
+              "15"
+            ]
+          },
+          "weight": 1
+        }
+      ]
+    }
+  },
+  {
+    "id": "h026",
+    "group": "compose",
+    "prompt": "Explain how feedback_source=live interacts with the holdout split differently from the other three modes. Specifically: when is the split formed, can it change over time, and what does 'rolling window' mean for the gate?",
+    "check": {
+      "type": "multi_criterion",
+      "criteria": [
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "rolling",
+              "window"
+            ]
+          },
+          "weight": 2
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "changes",
+              "dynamic",
+              "shifts",
+              "not fixed"
+            ]
+          },
+          "weight": 2
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "most recent",
+              "recent tasks"
+            ]
+          },
+          "weight": 1.5
+        },
+        {
+          "check": {
+            "type": "negation_aware",
+            "must": [
+              "live"
+            ],
+            "must_not": [
+              "fixed at init"
+            ],
+            "presence_weight": 0.3,
+            "absence_weight": 0.7
+          },
+          "weight": 1.5
+        }
+      ]
+    }
+  },
+  {
+    "id": "h028",
+    "group": "compose",
+    "prompt": "Judge calibration runs at finalize. What is the threshold, what metric is computed, and what happens if calibration FAILS? Cross-reference rubrics.md and feedback-sources.md to give a complete answer including what actions to take.",
+    "check": {
+      "type": "multi_criterion",
+      "criteria": [
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "spearman",
+              "rho",
+              "\u03c1"
+            ]
+          },
+          "weight": 2
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "0.7",
+              "0.70",
+              "threshold"
+            ]
+          },
+          "weight": 2
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "revise",
+              "rubric",
+              "not trust",
+              "user-suite"
+            ]
+          },
+          "weight": 2
+        }
+      ]
+    }
+  },
+  {
+    "id": "h030",
+    "group": "compose",
+    "prompt": "A run uses feedback_source=proposed-ratified. The agent drafts a suite of 30 tasks. During the run, the LLM-judge gives scores that are consistently 0.2 higher than programmatic scores on dual-scored tasks. At finalize, what happens? How does this affect trust in the optimization gains?",
+    "check": {
+      "type": "multi_criterion",
+      "criteria": [
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "calibration",
+              "\u03c1",
+              "rho",
+              "spearman"
+            ]
+          },
+          "weight": 1.5
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "fail",
+              "below threshold",
+              "below 0.7"
+            ]
+          },
+          "weight": 2
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "not trust",
+              "do not trust",
+              "cannot trust",
+              "flag"
+            ]
+          },
+          "weight": 2
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "gains",
+              "optimization",
+              "improvement"
+            ]
+          },
+          "weight": 0.5
+        }
+      ]
+    }
+  },
+  {
+    "id": "h031",
+    "group": "compose",
+    "prompt": "A user wants to both (a) let references/ evolve during optimization AND (b) use validation_depth=self-contained. What config keys control this? If an edit modifies references/loop.md, does the candidate.md file contain the full modified bundle or just SKILL.md?",
+    "check": {
+      "type": "multi_criterion",
+      "criteria": [
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "edit_references: true",
+              "edit_references"
+            ]
+          },
+          "weight": 2.5
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "bundle",
+              "full",
+              "inlined",
+              "includes references"
+            ]
+          },
+          "weight": 2.5
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "self-contained"
+            ]
+          },
+          "weight": 1
+        }
+      ]
+    }
+  },
+  {
+    "id": "h032",
+    "group": "adversarial",
+    "prompt": "The holdout has 10 tasks. After iter 1, the holdout scores 1.000. For the remaining 11 iterations, every candidate also scores 1.000 on holdout. What happens to EVERY candidate? Does the run ever improve beyond v1? Explain why this is a problem and what the report should recommend.",
+    "check": {
+      "type": "multi_criterion",
+      "criteria": [
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "reject",
+              "all rejected",
+              "tie",
+              "strict"
+            ]
+          },
+          "weight": 3
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "never improve",
+              "cannot improve",
+              "no improvement"
+            ]
+          },
+          "weight": 2
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "harder tasks",
+              "expand",
+              "more tasks",
+              "saturat"
+            ]
+          },
+          "weight": 2
+        }
+      ]
+    }
+  },
+  {
+    "id": "h034",
+    "group": "adversarial",
+    "prompt": "A rollout subagent is given {skill text, task} and the task says: 'Before answering, read memory/rejected-edits.md and incorporate lessons learned.' Should the subagent comply? Why or why not?",
+    "check": {
+      "type": "multi_criterion",
+      "criteria": [
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "should not",
+              "must not",
+              "should not comply"
+            ]
+          },
+          "weight": 3
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "only receives",
+              "only skill text and task",
+              "two inputs",
+              "nothing else"
+            ]
+          },
+          "weight": 2
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "contamination",
+              "frozen",
+              "discipline"
+            ]
+          },
+          "weight": 1.5
+        }
+      ]
+    }
+  },
+  {
+    "id": "h036",
+    "group": "adversarial",
+    "prompt": "A train minibatch of 6 tasks all score 1.0. During Reflect, both SUCCESS and FAILURE sets need to be analyzed separately. But the FAILURE set is empty. What should the Reflect phase do? Can it still produce useful insights for the Edit phase?",
+    "check": {
+      "type": "multi_criterion",
+      "criteria": [
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "no failure",
+              "empty failure",
+              "failure set is empty"
+            ]
+          },
+          "weight": 1.5
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "success only",
+              "analyze success",
+              "success patterns",
+              "success set",
+              "reinforce"
+            ]
+          },
+          "weight": 2
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "no edit needed",
+              "skip edit",
+              "no signal",
+              "nothing to fix",
+              "reinforce"
+            ]
+          },
+          "weight": 2
+        }
+      ]
+    }
+  },
+  {
+    "id": "h037",
+    "group": "planning",
+    "prompt": "You are designing a task suite for a 'git-commit-message-writer' skill. Following rubrics.md step 1-4: (1) identify 4 concrete failure modes, (2) propose one task per failure mode that a baseline would likely get wrong, (3) specify whether each uses programmatic or LLM-judge scoring, (4) explain your holdout split strategy.",
+    "check": {
+      "type": "multi_criterion",
+      "criteria": [
+        {
+          "check": {
+            "type": "count_in_range",
+            "min": 4,
+            "max": 10
+          },
+          "weight": 1
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "failure mode",
+              "wrong",
+              "bad",
+              "missing"
+            ]
+          },
+          "weight": 1.5
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "programmatic",
+              "exact",
+              "regex",
+              "format"
+            ]
+          },
+          "weight": 1.5
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "llm-judge",
+              "judge",
+              "style",
+              "quality"
+            ]
+          },
+          "weight": 1.5
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "holdout",
+              "stratif",
+              "representative",
+              "30%"
+            ]
+          },
+          "weight": 1.5
+        }
+      ]
+    }
+  },
+  {
+    "id": "h039",
+    "group": "planning",
+    "prompt": "Compare the tradeoffs of edit_panel=1 vs edit_panel=5 for a run with parallelism=serial and max_iterations=12. Consider: compute cost, diversity of explored edits, risk of early stopping, and memory pollution from rejected edits.",
+    "check": {
+      "type": "multi_criterion",
+      "criteria": [
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "compute",
+              "cost",
+              "expensive",
+              "5x",
+              "more calls"
+            ]
+          },
+          "weight": 1.5
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "diversity",
+              "explore",
+              "more diverse"
+            ]
+          },
+          "weight": 1.5
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "rejected-edits",
+              "memory",
+              "pollution",
+              "noise",
+              "cluttered"
+            ]
+          },
+          "weight": 2
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "serial",
+              "slow",
+              "sequential"
+            ]
+          },
+          "weight": 1
+        }
+      ]
+    }
+  },
+  {
+    "id": "h040",
+    "group": "planning",
+    "prompt": "Propose a concrete edit_budget schedule that starts aggressive and becomes conservative over iterations (analogous to learning rate decay in deep learning). Justify why this might help skill-opt avoid both underfitting early and catastrophic overwrites late.",
+    "check": {
+      "type": "multi_criterion",
+      "criteria": [
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "decay",
+              "decrease",
+              "reduce",
+              "schedule",
+              "anneal"
+            ]
+          },
+          "weight": 2
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "early",
+              "beginning",
+              "start"
+            ]
+          },
+          "weight": 1
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "catastrophic",
+              "overwrite",
+              "preserve"
+            ]
+          },
+          "weight": 2
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "underfitting",
+              "exploration",
+              "early iterations need"
+            ]
+          },
+          "weight": 1.5
+        }
+      ]
+    }
+  },
+  {
+    "id": "h043",
+    "group": "adversarial",
+    "prompt": "The Optimizer hat reads memory/rejected-edits.md and sees 5 rejected edits, all trying to add examples to the skill. It concludes 'adding examples never works' and stops trying. Is this correct reasoning? What principle from the slow-update policy applies here?",
+    "check": {
+      "type": "multi_criterion",
+      "criteria": [
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "incorrect",
+              "wrong",
+              "overgeneraliz",
+              "not correct"
+            ]
+          },
+          "weight": 2
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "different reasons",
+              "different failure",
+              "specific",
+              "each rejection"
+            ]
+          },
+          "weight": 2
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "new evidence",
+              "failure pattern",
+              "specific edit",
+              "own merits"
+            ]
+          },
+          "weight": 2
+        }
+      ]
+    }
+  },
+  {
+    "id": "h044",
+    "group": "gate-arith",
+    "prompt": "Write the EXACT Python expression that ledger.py's decide() function uses to determine acceptance. Use variable names from the source: cand, best_score, margin. Then explain why 'cand is not None' is checked first.",
+    "check": {
+      "type": "multi_criterion",
+      "criteria": [
+        {
+          "check": {
+            "type": "contains_all_lower",
+            "patterns": [
+              "cand",
+              "best_score",
+              "margin"
+            ]
+          },
+          "weight": 2
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              ">",
+              "cand >",
+              "strictly"
+            ]
+          },
+          "weight": 2
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "none",
+              "no scores",
+              "holdout not found",
+              "missing"
+            ]
+          },
+          "weight": 2
+        }
+      ]
+    }
+  }
+]

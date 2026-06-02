@@ -1,0 +1,10 @@
+iter,kind,version,split,mean_score,n,decision
+0,eval,v0,holdout,0.963736,14,
+1,eval,v0,train,0.990733,6,
+1,eval,c1,holdout,0.976190,14,
+1,gate,c1,holdout,0.976190,,accept
+2,eval,v1,train,1.000000,6,
+3,eval,v1,train,0.944444,6,
+3,eval,c2,holdout,1.000000,14,
+3,gate,c2,holdout,1.000000,,accept
+4,eval,v2,train,0.927381,6,

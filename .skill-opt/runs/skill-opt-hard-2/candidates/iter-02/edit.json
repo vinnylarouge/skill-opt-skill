@@ -1,0 +1,20 @@
+[
+  {
+    "op": "add",
+    "location": "After '## What This Does' paragraph, before '## Up-Front Questionnaire'",
+    "content": "## Quick Reference\n\n- **Gate:** candidate must beat the best by more than gate_margin (strict; ties rejected)\n- **Budget:** ≤max_ops ops, net |added−removed| ≤ max_words\n- **Frozen target:** each subagent sees only skill text + task prompt",
+    "rationale": "Place key terms (beat, best, candidate, subagent, skill, task) at the TOP where subagents see them first. Iter-01 showed that placing 'beat the best' inside the defaults table doesn't anchor terminology strongly enough — subagents paraphrase it away. A top-level Quick Reference section will be the first thing read and should anchor concise answers."
+  },
+  {
+    "op": "add",
+    "location": "After 'Run Directory Layout' section, before 'Resume'",
+    "content": "## ledger.py CLI Reference\n\n```\nledger.py record --run <path> --iter <N> --version <label> --split train|holdout --scores <comma-separated-floats>\nledger.py gate   --run <path> --iter <N> --candidate <cN> --margin <float>\nledger.py best   --run <path>\n```\n\n`--scores` takes comma-separated floats, e.g. `--scores \"0.8,1.0,0.6\"`.",
+    "rationale": "Same as iter-01 — subagents guess --run-dir and space-separated scores. Still needed."
+  },
+  {
+    "op": "add",
+    "location": "Minibatch Sampling section, after last bullet",
+    "content": "Epoch count after K iterations = K×M/T (float division; partial epochs count).",
+    "rationale": "Same as iter-01 — subagent used integer division. Still needed."
+  }
+]

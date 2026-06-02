@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>skill-opt — the one-man show (orchestration ⇄ skill)</title>
+
+<!-- the scholar's voice -->
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sugina-dev/latin-modern-web@1.0.1/style/latinmodern-roman.css">
+<!-- the machine's voice -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap">
+
+<style>
+:root{
+  --paper:#FAF9F6; --ink:#111111; --ink-soft:#5a5a55;
+  --blue:#0050FF;            /* structure / staffed / a team in space */
+  --orange:#F38020;          /* the active hat / the agent moving in time */
+  --hair:rgba(17,17,17,.14);
+  --serif:'Latin Modern Roman', Georgia, 'Times New Roman', serif;
+  --mono:'JetBrains Mono', ui-monospace, Menlo, monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:var(--serif); font-size:18px; line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  display:flex; flex-direction:column; align-items:center;
+  padding:6vh 5vw;
+}
+.wrap{max-width:780px; width:100%}
+.kicker{font-family:var(--mono); font-size:.72rem; letter-spacing:.18em;
+  text-transform:uppercase; color:var(--blue); margin:0 0 .8rem;}
+h1{font-size:2.1rem; line-height:1.08; margin:0 0 .5em; font-weight:700;}
+h1 em{font-style:italic}
+p{margin:0 0 1rem; max-width:42em;}
+p em{font-style:italic}
+.lead{color:var(--ink-soft)}
+.tk{font-family:var(--mono); font-weight:500}
+
+/* ---- the hat rail (the pile of hats) ------------------------------- */
+.hatrail{display:flex; gap:.5rem; flex-wrap:wrap; align-items:center;
+  margin:1.6rem 0 .4rem; font-family:var(--mono); font-size:.66rem}
+.hatrail .lbl{color:var(--ink-soft); letter-spacing:.1em; text-transform:uppercase; margin-right:.2rem}
+.hat{border:1.4px solid var(--hair); color:var(--ink-soft); padding:.34rem .6rem;
+  background:var(--paper); transition:.25s; letter-spacing:.04em}
+.hat.staffed{border-color:var(--blue); color:var(--blue)}      /* factory: all on at once */
+.hat.wearing{border-color:var(--orange); color:var(--orange); box-shadow:0 0 0 3px rgba(243,128,32,.14)} /* solo: the one being worn */
+
+/* ---- the loop graph (shared by both modes) ------------------------- */
+.stage{border:1.4px solid var(--hair); background:#fff; padding:14px 10px; margin-top:.2rem}
+#flow{width:100%; height:auto; display:block}
+.node rect,.node polygon{fill:var(--paper); stroke:var(--ink); stroke-width:1.6;
+  transition:stroke .3s,stroke-width .3s,fill .3s}
+.node text{font-family:var(--mono); font-size:11px; fill:var(--ink); text-anchor:middle; dominant-baseline:middle}
+.node text.sub{font-size:8.5px; fill:var(--ink-soft)}
+.node.lit rect,.node.lit polygon{stroke:var(--blue); stroke-width:2.2}
+.node.active rect,.node.active polygon{stroke:var(--orange); stroke-width:2.6; fill:#fff4ec}
+.node.outcome rect{stroke-dasharray:none}
+.edge{stroke:var(--ink); stroke-width:1.4; fill:none; marker-end:url(#arrow); opacity:.5; transition:.3s}
+.edge.faint{opacity:.22; stroke-dasharray:4 4}
+.edge.pulse{stroke:var(--orange); opacity:1; stroke-width:2.4; marker-end:url(#arrowO)}
+.edge-label{font-family:var(--mono); font-size:9px; fill:var(--ink-soft); text-anchor:middle}
+
+.caption{font-family:var(--mono); font-size:.74rem; color:var(--ink-soft);
+  margin-top:.9rem; text-align:center; line-height:1.45; min-height:2.6em}
+.caption b{color:var(--ink)} .caption .sp{color:var(--blue); font-weight:700} .caption .ti{color:var(--orange); font-weight:700}
+
+.controls{display:flex; gap:.6rem; flex-wrap:wrap; align-items:center; justify-content:center; margin-top:1rem}
+button.pp{font-family:var(--mono); font-size:.74rem; letter-spacing:.03em;
+  background:var(--paper); color:var(--ink); border:1.5px solid var(--ink);
+  padding:.5rem .85rem; cursor:pointer; transition:.15s}
+button.pp:hover{background:var(--ink); color:var(--paper)}
+button.pp.accent{border-color:var(--blue); color:var(--blue)}
+button.pp.accent:hover{background:var(--blue); color:#fff}
+.foot{font-family:var(--mono); font-size:.66rem; color:var(--ink-soft); margin-top:2rem; text-align:center}
+.foot a{color:var(--blue)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="kicker">skill-opt · explainer</p>
+  <h1>The same optimizer, in space or in time.</h1>
+  <p class="lead">Microsoft's <a href="https://microsoft.github.io/SkillOpt/">SkillOpt</a> improves a skill with
+     <em>four roles</em> — a frozen <b>Target</b>, an <b>Optimizer</b>, a <b>Gate</b>, and a <b>Memory</b> —
+     passing artifacts between them. That's an <em>orchestration</em>: a team of agents working at once, in
+     <span style="color:var(--blue)">space</span>.</p>
+  <p>But anything a team does by passing messages, a <em>single</em> agent can do by swapping hats in sequence —
+     putting one on, doing that role's bit, taking it off, checking the run-directory mailbox, putting on the
+     next. That's a <em>skill</em>: one agent, four hats, in <span style="color:var(--orange)">time</span>. The
+     only real difference is parallelism. <b>Flip the toggle and watch the team collapse into one actor.</b></p>
+
+  <div class="hatrail">
+    <span class="lbl">hats</span>
+    <span class="hat" data-role="target">TARGET · frozen</span>
+    <span class="hat" data-role="optimizer">OPTIMIZER · reflect+edit</span>
+    <span class="hat" data-role="gate">GATE · held-out</span>
+    <span class="hat" data-role="memory">MEMORY · rejected-edits</span>
+  </div>
+
+  <div class="stage">
+    <svg id="flow" viewBox="0 0 560 332" preserveAspectRatio="xMidYMid meet" aria-label="skill-opt optimization loop">
+      <defs>
+        <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M0,0 L8,4 L0,8 z" fill="#111"></path>
+        </marker>
+        <marker id="arrowO" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M0,0 L8,4 L0,8 z" fill="#F38020"></path>
+        </marker>
+      </defs>
+
+      <!-- edges -->
+      <path class="edge" id="e-loop"   d="M464,266 C470,150 360,30 327,29"></path>
+      <path class="edge" id="e-su-ro"  d="M256,50 L152,86"></path>
+      <path class="edge" id="e-su-sc"  d="M304,50 L408,86"></path>
+      <path class="edge" id="e-ro-re"  d="M150,132 L252,153"></path>
+      <path class="edge" id="e-sc-re"  d="M410,132 L308,153"></path>
+      <path class="edge" id="e-re-ed"  d="M280,190 L280,205"></path>
+      <path class="edge" id="e-ed-ga"  d="M280,240 L280,255"></path>
+      <path class="edge" id="e-accept" d="M336,283 L396,283"></path>
+      <path class="edge" id="e-reject" d="M224,283 C168,289 122,262 112,240"></path>
+      <path class="edge" id="e-retry"  d="M72,200 C72,166 150,150 222,166"></path>
+
+      <!-- edge labels -->
+      <text class="edge-label" x="280" y="70">fan-out ∥</text>
+      <text class="edge-label" x="368" y="276">accept</text>
+      <text class="edge-label" x="150" y="272">reject</text>
+      <text class="edge-label" x="138" y="146">retry</text>
+      <text class="edge-label" x="430" y="120" style="opacity:.5">next iter ⟳</text>
+
+      <!-- nodes -->
+      <g class="node" id="n-setup"><rect x="235" y="16" width="90" height="34" rx="3"></rect><text x="280" y="33">setup</text></g>
+      <g class="node" id="n-rollout"><rect x="52" y="86" width="138" height="46" rx="3"></rect><text x="121" y="103">rollout</text><text class="sub" x="121" y="119">frozen ⊂-agent</text></g>
+      <g class="node" id="n-score"><rect x="370" y="86" width="138" height="46" rx="3"></rect><text x="439" y="103">score</text><text class="sub" x="439" y="119">judge</text></g>
+      <g class="node" id="n-reflect"><rect x="222" y="152" width="116" height="38" rx="3"></rect><text x="280" y="171">reflect</text></g>
+      <g class="node" id="n-edit"><rect x="230" y="205" width="100" height="35" rx="3"></rect><text x="280" y="223">edit</text></g>
+      <g class="node" id="n-gate"><polygon points="280,256 336,283 280,310 224,283"></polygon><text x="280" y="283">gate?</text></g>
+      <g class="node outcome" id="n-ship"><rect x="396" y="266" width="134" height="35" rx="3"></rect><text x="463" y="283">v+1 ✓ accept</text></g>
+      <g class="node" id="n-memory"><rect x="24" y="200" width="96" height="40" rx="3"></rect><text x="72" y="216">memory</text><text class="sub" x="72" y="230">rejected-edits</text></g>
+    </svg>
+  </div>
+
+  <div class="caption" id="cap"></div>
+
+  <div class="controls">
+    <button class="pp accent" id="toggle">⇄ flip to one-man-with-hats</button>
+    <button class="pp" id="play">▶ autoplay the walk</button>
+  </div>
+
+  <p class="foot">
+    Same loop, two readings. The committed proof run took a deliberately-weak skill from held-out
+    <b>0.70 → 1.00</b>, gated by arithmetic, with judge calibration ρ=0.868.
+    &nbsp;·&nbsp; <a href="https://github.com/">repo & methodology ↑</a>
+  </p>
+</div>
+
+<script>
+"use strict";
+const $=s=>document.querySelector(s);
+const node=id=>$("#n-"+id);
+const hat =r =>document.querySelector('.hat[data-role="'+r+'"]');
+
+const NODES=["setup","rollout","score","reflect","edit","gate","ship","memory"];
+const HATS =["target","optimizer","gate","memory"];
+// which hat owns each phase
+const OWNER={setup:"optimizer", rollout:"target", score:"gate",
+             reflect:"optimizer", edit:"optimizer", gate:"gate",
+             memory:"memory", ship:null};
+// the walk a single agent makes: gate rejects once (teaches memory, retry), then accepts.
+const PATH=["setup","rollout","score","reflect","edit","gate","memory",
+            "reflect","edit","gate","ship"];
+// edge to pulse as we LEAVE a node, per step index
+function leavingEdge(cur,nxt){
+  if(cur==="gate"&&nxt==="memory") return "e-reject";
+  if(cur==="gate"&&nxt==="ship")   return "e-accept";
+  if(cur==="memory"&&nxt==="reflect") return "e-retry";
+  if(cur==="ship")  return "e-loop";
+  return null;
+}
+
+const CAP_FACTORY='<b class="sp">factory line</b> — Target · Optimizer · Gate · Memory all staffed at once; '
+  +'artifacts pass through the run-dir mailbox. A team, in <span class="sp">space</span>.';
+function capSolo(role){
+  return '<b class="ti">one-man-with-hats</b> — one agent wears the <b class="ti">'
+    +(role?role.toUpperCase():"—")+'</b> hat, does that bit, checks the run-dir, swaps. '
+    +'The same loop, walked in <span class="ti">time</span>.';
+}
+
+let solo=false, timer=null, i=0;
+function clearAll(){
+  NODES.forEach(n=>node(n).classList.remove("lit","active"));
+  HATS.forEach(h=>hat(h).classList.remove("staffed","wearing"));
+  document.querySelectorAll(".edge").forEach(e=>e.classList.remove("pulse"));
+}
+function showFactory(){
+  clearAll();
+  NODES.forEach(n=>{ if(n!=="ship") node(n).classList.add("lit"); });
+  HATS.forEach(h=>hat(h).classList.add("staffed"));
+  $("#cap").innerHTML=CAP_FACTORY;
+}
+function stepSolo(){
+  clearAll();
+  const cur=PATH[i], nxt=PATH[(i+1)%PATH.length];
+  node(cur).classList.add("active");
+  if(OWNER[cur]) hat(OWNER[cur]).classList.add("wearing");
+  const e=leavingEdge(cur,nxt); if(e) $("#"+e).classList.add("pulse");
+  $("#cap").innerHTML=capSolo(OWNER[cur]);
+  i=(i+1)%PATH.length;
+}
+function startSolo(){
+  solo=true;
+  if(timer) clearInterval(timer);
+  i=0; stepSolo(); timer=setInterval(stepSolo,1050);
+  $("#toggle").textContent="⇄ flip to factory line";
+  $("#play").textContent="⏸ pause";
+}
+function startFactory(){
+  solo=false;
+  if(timer){clearInterval(timer); timer=null;}
+  showFactory();
+  $("#toggle").textContent="⇄ flip to one-man-with-hats";
+  $("#play").textContent="▶ autoplay the walk";
+}
+$("#toggle").onclick=()=> solo? startFactory() : startSolo();
+$("#play").onclick=()=>{
+  if(solo && timer){ clearInterval(timer); timer=null; $("#play").textContent="▶ resume the walk"; }
+  else startSolo();
+};
+
+showFactory();
+</script>
+</body>
+</html>

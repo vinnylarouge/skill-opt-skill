@@ -1,0 +1,23 @@
+{
+  "iter": 2,
+  "edit_budget": {"max_ops": 3, "max_words": 80},
+  "ops": [
+    {
+      "op": "replace",
+      "location": "Run Directory Layout > ledger.csv comment",
+      "old_text": "ledger.csv      (source of truth; columns: iter, kind, version, split, mean_score, n, decision)",
+      "new_text": "ledger.csv      (source of truth; columns: iter, kind, version, split, mean_score, n, decision)\n                kind: eval | gate.  split: train | holdout.  decision: accept | reject | (empty).",
+      "rationale": "Train t026 scored 0.0: agent confused kind values (eval/gate) with split values (train/holdout). The column enum values were never documented. Adding them inline."
+    },
+    {
+      "op": "replace",
+      "location": "Up-Front Questionnaire > plain-string note",
+      "old_text": "Values above are plain strings (e.g. autonomous, not code-fenced).",
+      "new_text": "Values above are plain strings — reply with raw text, never backtick-wrapped.",
+      "rationale": "Train t001 scored 0.0: agent still wraps answer in backticks despite v1 note. Stronger instruction: 'never backtick-wrapped'."
+    }
+  ],
+  "ops_count": 2,
+  "net_words_estimate": 25,
+  "within_budget": true
+}

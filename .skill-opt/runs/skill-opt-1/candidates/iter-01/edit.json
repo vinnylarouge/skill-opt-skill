@@ -1,0 +1,23 @@
+{
+  "iter": 1,
+  "edit_budget": {"max_ops": 3, "max_words": 80},
+  "ops": [
+    {
+      "op": "replace",
+      "location": "Disciplines > Frozen target bullet",
+      "old_text": "**Frozen target via fresh subagent** — each rollout subagent receives only `{skill text, task}`; no\n  contamination, no self-grading.",
+      "new_text": "**Frozen target via fresh subagent** — each rollout subagent receives exactly two inputs: the current skill text and the task prompt. Nothing else is passed to the subagent.",
+      "rationale": "Train t015 scored 0.5: agent listed exclusions ('conversation history') alongside correct answer, triggering must_not check. Reframing positively ('exactly two inputs ... nothing else') discourages open-ended elaboration of what is excluded."
+    },
+    {
+      "op": "replace",
+      "location": "Up-Front Questionnaire > table header row note",
+      "old_text": "See `references/feedback-sources.md` for how each `feedback_source` builds the task suite.",
+      "new_text": "Values above are plain strings (e.g. `autonomous`, not code-fenced). See `references/feedback-sources.md` for how each `feedback_source` builds the task suite.",
+      "rationale": "Holdout t000 scored 0.0: agent responded '`autonomous`' with backtick wrapping because table values use code formatting. Adding a note that values are plain strings should reduce formatting leakage."
+    }
+  ],
+  "ops_count": 2,
+  "net_words_estimate": 22,
+  "within_budget": true
+}

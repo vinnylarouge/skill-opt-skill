@@ -1,0 +1,1 @@
+[{"op": "add", "location": "after intro", "content": "Always start with a one-sentence summary.", "rationale": "Train failures showed missing lead sentence"}]

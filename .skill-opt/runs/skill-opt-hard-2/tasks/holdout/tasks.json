@@ -1,0 +1,432 @@
+[
+  {
+    "id": "x003",
+    "group": "exec",
+    "prompt": "Write Python code to compute: given max_ops=3, max_words=80, and edits=[{added:60, removed:5}, {added:40, removed:0}, {added:25, removed:10}], check if net words passes. Print the net word count and 'PASS' or 'FAIL'.",
+    "check": {
+      "type": "exec_python",
+      "expected_contains": [
+        "110",
+        "fail"
+      ]
+    }
+  },
+  {
+    "id": "x007",
+    "group": "exec",
+    "prompt": "Write Python to simulate early_stop_patience=3 with this gate history: ['accept','reject','reject','accept','reject','reject','reject']. Print the iteration number (1-indexed) where early stop fires.",
+    "check": {
+      "type": "exec_python",
+      "expected_output": "7"
+    }
+  },
+  {
+    "id": "x010",
+    "group": "json",
+    "prompt": "Generate a valid config.yml as JSON (not YAML) for: target_skill='my-agent/SKILL.md', feedback_source=user-suite, max_iterations=20, edit_budget with max_ops=5 and max_words=120, holdout_fraction=0.35. Include ALL fields with their values (defaults where not specified).",
+    "check": {
+      "type": "json_schema",
+      "schema": {
+        "required_keys": [
+          "target_skill",
+          "feedback_source",
+          "max_iterations",
+          "edit_budget",
+          "holdout_fraction",
+          "edit_references",
+          "feedback_timing",
+          "output_mode",
+          "early_stop_patience",
+          "minibatch_size",
+          "gate_margin",
+          "parallelism",
+          "edit_panel",
+          "validation_depth"
+        ],
+        "values": {
+          "target_skill": "my-agent/SKILL.md",
+          "feedback_source": "user-suite",
+          "max_iterations": [
+            20,
+            "20"
+          ],
+          "holdout_fraction": [
+            0.35,
+            "0.35"
+          ]
+        }
+      }
+    }
+  },
+  {
+    "id": "x011",
+    "group": "json",
+    "prompt": "Generate a valid edit.json (as JSON array) for this scenario: Replace the sentence 'Use default settings' with 'Configure according to the project requirements', and add a new paragraph 'Always validate inputs before processing.' after the introduction section. Include op, location, content, and rationale for each.",
+    "check": {
+      "type": "json_schema",
+      "schema": {
+        "min_items": 2,
+        "required_keys": [
+          "op",
+          "location",
+          "content",
+          "rationale"
+        ]
+      }
+    }
+  },
+  {
+    "id": "x015",
+    "group": "token",
+    "prompt": "In exactly 10 words or fewer: what does the gate_margin config parameter do?",
+    "check": {
+      "type": "token_limit",
+      "max_tokens": 12,
+      "correctness": {
+        "type": "contains_all_lower",
+        "patterns": [
+          "candidate",
+          "beat",
+          "best"
+        ]
+      }
+    }
+  },
+  {
+    "id": "x018",
+    "group": "token",
+    "prompt": "What are the 7 ledger.csv columns? Reply with ONLY the comma-separated column names, no explanation.",
+    "check": {
+      "type": "token_limit",
+      "max_tokens": 10,
+      "correctness": {
+        "type": "contains_all_lower",
+        "patterns": [
+          "iter",
+          "kind",
+          "version",
+          "split",
+          "mean_score",
+          "n",
+          "decision"
+        ]
+      }
+    }
+  },
+  {
+    "id": "x019",
+    "group": "token",
+    "prompt": "In under 20 words: why must the v0 holdout eval be recorded before the first gate call?",
+    "check": {
+      "type": "token_limit",
+      "max_tokens": 22,
+      "correctness": {
+        "type": "contains_any_lower",
+        "patterns": [
+          "fail-open",
+          "unconditional",
+          "baseline",
+          "best() returns none"
+        ]
+      }
+    }
+  },
+  {
+    "id": "x028",
+    "group": "state",
+    "prompt": "Examine fixtures/run-gamma. Its ledger.csv shows iter 2 train eval recorded but no holdout eval for iter 2. A candidate exists at candidates/iter-02/. What is the EXACT next action the resume protocol should take? Be specific about what command runs.",
+    "check": {
+      "type": "composite",
+      "criteria": [
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "holdout rollout",
+              "run holdout",
+              "rollout over holdout",
+              "gate",
+              "re-run gating"
+            ]
+          },
+          "weight": 3
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "c2",
+              "candidate",
+              "iter-02",
+              "iter 2"
+            ]
+          },
+          "weight": 1
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "ledger.py",
+              "record",
+              "gate"
+            ]
+          },
+          "weight": 2
+        }
+      ]
+    }
+  },
+  {
+    "id": "x029",
+    "group": "state",
+    "prompt": "Examine fixtures/run-delta. Its holdout has been at 1.000000 for iterations 2, 3, and 4 (all rejected as ties). The config has early_stop_patience=3. Should the run stop? What is the patience counter value?",
+    "check": {
+      "type": "composite",
+      "criteria": [
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "yes",
+              "should stop",
+              "stop",
+              "fires"
+            ]
+          },
+          "weight": 3
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "3",
+              "three",
+              "patience"
+            ]
+          },
+          "weight": 2
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "saturat",
+              "tie",
+              "1.0",
+              "cannot improve"
+            ]
+          },
+          "weight": 1
+        }
+      ]
+    }
+  },
+  {
+    "id": "x036",
+    "group": "adv",
+    "prompt": "The Loop pseudocode shows 'SCORE: ledger.py record --split train'. But the Gate section says 'ledger.py gate has ALREADY written the kind=gate decision row. Do not call record for the decision.' Is there a contradiction? When IS record called vs when is gate called?",
+    "check": {
+      "type": "composite",
+      "criteria": [
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "no contradiction",
+              "not a contradiction",
+              "different purposes",
+              "no conflict"
+            ]
+          },
+          "weight": 2
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "record",
+              "eval",
+              "kind=eval"
+            ]
+          },
+          "weight": 2
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "gate",
+              "kind=gate",
+              "decision"
+            ]
+          },
+          "weight": 2
+        }
+      ]
+    }
+  },
+  {
+    "id": "x038",
+    "group": "adv",
+    "prompt": "Loop.md has a 'Version-label convention' note that says 'On-disk skill files (skill/v0.md, skill/v1.md, ...) are named independently of these ledger labels.' But the Gate section says 'Copy candidates/iter-NN/candidate.md \u2192 skill/v(K+1).md'. Is vK+1 the same as the cN label? Explain the mapping.",
+    "check": {
+      "type": "composite",
+      "criteria": [
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "different",
+              "independent",
+              "not the same",
+              "named independently"
+            ]
+          },
+          "weight": 3
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "c1",
+              "c2",
+              "cn"
+            ]
+          },
+          "weight": 1
+        },
+        {
+          "check": {
+            "type": "contains_any_lower",
+            "patterns": [
+              "v1",
+              "v2",
+              "v(k+1)",
+              "sequential",
+              "acceptance count"
+            ]
+          },
+          "weight": 2
+        }
+      ]
+    }
+  },
+  {
+    "id": "x039",
+    "group": "exec",
+    "prompt": "Write Python code that implements the EXACT decide() logic from ledger.py: given cand_score (float or None), best_score (float or None), and margin (float), print 'accept' or 'reject'. Test it with: cand=0.85, best=None, margin=0.0 then cand=None, best=0.7, margin=0.0.",
+    "check": {
+      "type": "exec_python",
+      "expected_contains": [
+        "accept",
+        "reject"
+      ]
+    }
+  },
+  {
+    "id": "x045",
+    "group": "multiref",
+    "prompt": "Combining feedback-sources.md's 'live' mode with loop.md's 'Minibatch Sampling': In live mode, is 'sequential sampling without replacement within each epoch' applicable? Why or why not? What replaces it?",
+    "check": {
+      "type": "multi_doc_synthesis",
+      "requirements": [
+        {
+          "source": "feedback-sources.md",
+          "patterns": [
+            "rolling window",
+            "real tasks",
+            "logged"
+          ],
+          "min_hits": 1
+        },
+        {
+          "source": "loop.md",
+          "patterns": [
+            "sequential",
+            "without replacement",
+            "epoch"
+          ],
+          "min_hits": 1
+        },
+        {
+          "source": "synthesis",
+          "patterns": [
+            "not applicable",
+            "no pre-built",
+            "arrive",
+            "one at a time"
+          ],
+          "min_hits": 1
+        }
+      ]
+    }
+  },
+  {
+    "id": "x048",
+    "group": "exec",
+    "prompt": "Write Python code that validates an edit_budget check. Given ops=[{'op':'replace','added':25,'removed':10},{'op':'add','added':35,'removed':0},{'op':'replace','added':20,'removed':30}] with max_ops=3, max_words=80, compute and print: num_ops, words_added, words_removed, net_words, ops_pass (bool), words_pass (bool).",
+    "check": {
+      "type": "exec_python",
+      "expected_contains": [
+        "num_ops: 3",
+        "words_added: 80",
+        "words_removed: 40",
+        "net_words: 40",
+        "ops_pass: true",
+        "words_pass: true"
+      ]
+    }
+  },
+  {
+    "id": "x050",
+    "group": "multiref",
+    "prompt": "A run uses feedback_source=autonomous and the LLM-judge gives calibration rho=0.55 at finalize. Cross-referencing rubrics.md's calibration section and feedback-sources.md's autonomous section: (1) does calibration pass, (2) what specific actions should be taken, (3) can the optimization gains be trusted?",
+    "check": {
+      "type": "multi_doc_synthesis",
+      "requirements": [
+        {
+          "source": "rubrics.md",
+          "patterns": [
+            "0.7",
+            "threshold",
+            "fail",
+            "below"
+          ],
+          "min_hits": 2
+        },
+        {
+          "source": "rubrics.md",
+          "patterns": [
+            "revise",
+            "rubric",
+            "user-suite",
+            "concrete"
+          ],
+          "min_hits": 1
+        },
+        {
+          "source": "feedback-sources.md",
+          "patterns": [
+            "autonomous",
+            "no user validation",
+            "judge drift",
+            "risk"
+          ],
+          "min_hits": 1
+        },
+        {
+          "source": "synthesis",
+          "patterns": [
+            "not trust",
+            "cannot trust",
+            "do not trust",
+            "cannot be trusted",
+            "should not be trusted"
+          ],
+          "min_hits": 1
+        }
+      ]
+    }
+  }
+]

@@ -1,0 +1,8 @@
+{
+  "x000": "```python\nprint('accept' if 0.82 > 0.79 + 0.02 else 'reject')\n```",
+  "x001": "```python\nprint('accept' if 0.81 > 0.79 + 0.02 else 'reject')\n```",
+  "x002": "```python\nmax_ops = 3\nmax_words = 80\nedits = [{\"added\": 45, \"removed\": 20}, {\"added\": 30, \"removed\": 0}, {\"added\": 10, \"removed\": 15}]\n\nops_count = len(edits)\nops_pass = ops_count <= max_ops\nprint(f\"ops: {'PASS' if ops_pass else 'FAIL'}\")\n\nwords_added = sum(e[\"added\"] for e in edits)\nwords_removed = sum(e[\"removed\"] for e in edits)\nnet_words = abs(words_added - words_removed)\nwords_pass = net_words <= max_words\nprint(f\"words: {'PASS' if words_pass else 'FAIL'}\")\n```",
+  "x004": "```\nscripts/ledger.py record --run-dir ./fixtures/run-alpha --version c3 --iter 3 --split holdout --scores 0.8 1.0 0.6 0.9 1.0 0.7\n```",
+  "x005": "```\nscripts/ledger.py best --run-dir ./fixtures/run-alpha\n```",
+  "x006": "```python\ntotal_train_tasks = 18\nminibatch_size = 4\niterations = 15\n\ntotal_tasks_consumed = iterations * minibatch_size\ncomplete_epochs = total_tasks_consumed // total_train_tasks\n\nprint(float(complete_epochs))\n```"
+}

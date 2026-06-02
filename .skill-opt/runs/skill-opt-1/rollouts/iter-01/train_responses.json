@@ -1,0 +1,8 @@
+{
+  "t002": "0.3",
+  "t012": "iter, kind, version, split, mean_score, n, decision",
+  "t013": "rollout, score, reflect, edit, gate, memory",
+  "t015": "The dispatched Rollout subagent receives exactly two things:\n\n1. The **current skill text**\n2. The **task**\n\nNothing else. No prior trajectories, no grading rubrics, no conversation history, no other context \u2014 this is explicitly enforced by the \"Frozen target via fresh subagent\" discipline.",
+  "t017": "N. The gate decision is made by `scripts/ledger.py gate`, which does arithmetic on `ledger.csv` \u2014 not by an LLM.",
+  "t025": "python scripts/ledger.py gate --run .skill-opt/runs/foo-1/ --iter 2 --candidate c2"
+}

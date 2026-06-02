@@ -1,0 +1,14 @@
+target_skill: skill/SKILL.md
+edit_references: false
+feedback_source: user-suite
+feedback_timing: autonomous
+output_mode: save-as-new
+max_iterations: 8
+early_stop_patience: 3
+edit_budget: {max_ops: 3, max_words: 80}
+minibatch_size: 6
+holdout_fraction: 0.3
+gate_margin: 0.0
+parallelism: serial
+edit_panel: 1
+validation_depth: self-contained

@@ -1,0 +1,115 @@
+[
+  {
+    "id": "t000",
+    "group": "config",
+    "prompt": "User wants to optimize ~/foo/SKILL.md with NO further user input or oversight (fully automated). What single value belongs in `feedback_source`? Reply with just the value.",
+    "check": {
+      "type": "exact_lower",
+      "value": "autonomous"
+    }
+  },
+  {
+    "id": "t005",
+    "group": "config",
+    "prompt": "Default `early_stop_patience`? Reply with just the number.",
+    "check": {
+      "type": "contains_any_lower",
+      "patterns": [
+        "3"
+      ]
+    }
+  },
+  {
+    "id": "t007",
+    "group": "layout",
+    "prompt": "Where on disk does the candidate skill for iteration 3 get written? Just the relative path inside the run dir.",
+    "check": {
+      "type": "regex_lower",
+      "pattern": "candidates/iter-0?3/candidate\\.md"
+    }
+  },
+  {
+    "id": "t010",
+    "group": "layout",
+    "prompt": "Where is the v0 baseline skill saved before the loop starts? Relative path inside the run dir.",
+    "check": {
+      "type": "contains_any_lower",
+      "patterns": [
+        "skill/v0.md",
+        "v0.md"
+      ]
+    }
+  },
+  {
+    "id": "t016",
+    "group": "phases",
+    "prompt": "During Reflect, the minibatch is split into which two sets?",
+    "check": {
+      "type": "contains_all_lower",
+      "patterns": [
+        "success",
+        "failure"
+      ]
+    }
+  },
+  {
+    "id": "t018",
+    "group": "discipline",
+    "prompt": "Can the gate use TRAIN-split scores to accept a candidate? Y or N.",
+    "check": {
+      "type": "starts_with_word_lower",
+      "patterns": [
+        "n",
+        "no"
+      ]
+    }
+  },
+  {
+    "id": "t021",
+    "group": "discipline",
+    "prompt": "May an established rule be overturned by a single bad minibatch? Y or N.",
+    "check": {
+      "type": "starts_with_word_lower",
+      "patterns": [
+        "n",
+        "no"
+      ]
+    }
+  },
+  {
+    "id": "t023",
+    "group": "gate",
+    "prompt": "Given best_so_far=0.75 and candidate_mean=0.75 with gate_margin=0.0, does `ledger.py gate` accept or reject? One word.",
+    "check": {
+      "type": "contains_any_lower",
+      "patterns": [
+        "reject"
+      ]
+    }
+  },
+  {
+    "id": "t024",
+    "group": "gate",
+    "prompt": "Given best=0.70, candidate=0.78, margin=0.0 \u2014 accept or reject? One word.",
+    "check": {
+      "type": "contains_any_lower",
+      "patterns": [
+        "accept"
+      ]
+    }
+  },
+  {
+    "id": "t029",
+    "group": "resume",
+    "prompt": "Resume finds `rollouts/iter-02/task-04/` has `trajectory.md` but no `score.json`. What does it do next for that leaf?",
+    "check": {
+      "type": "contains_any_lower",
+      "patterns": [
+        "score",
+        "judge",
+        "re-score",
+        "compute"
+      ]
+    }
+  }
+]
